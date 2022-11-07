@@ -40,7 +40,7 @@ clean:
 
 submit: clean
 	git gc
-	bash -c submit.sh
+	bash submit.sh
 
 
 .PHONY: compile antlr test run clean submit

@@ -12,7 +12,6 @@ public class Main
             System.err.println("input path is required");
         }
         String source = args[0];
-//        String source = "hello.txt";
         CharStream input = CharStreams.fromFileName(source);
         SysYLexer sysYLexer = new SysYLexer(input);
         sysYLexer.removeErrorListeners();
@@ -30,8 +29,7 @@ public class Main
                     System.err.println(ruleName + " " + token.getText() + " at Line " + token.getLine() + ".");
                 }
             }
-        } catch (RuntimeException ignored) {
-        }
+        } catch (RuntimeException ignored) {}
     }
 
     public static Integer parseInt(String text) {

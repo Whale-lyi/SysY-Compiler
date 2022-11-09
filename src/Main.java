@@ -20,11 +20,22 @@ public class Main
         List<? extends Token> allTokens = sysYLexer.getAllTokens();
         String[] ruleNames = sysYLexer.getRuleNames();
         for (Token token : allTokens) {
-            if (token.getType() == 34) {
-                System.err.println(ruleNames[33] + " " + Integer.parseInt(token.getText()) + " at Line " + token.getLine() + ".");
+            String ruleName = ruleNames[token.getType() - 1];
+            if (ruleName.equals("INTEGR_CONST")) {
+                Integer number = parseInt(token.getText());
+                System.err.println(ruleName + " " + number + " at Line " + token.getLine() + ".");
             } else {
-                System.err.println(ruleNames[token.getType() - 1] + " " + token.getText() + " at Line " + token.getLine() + ".");
+                System.err.println(ruleName + " " + token.getText() + " at Line " + token.getLine() + ".");
             }
         }
+    }
+
+    public static Integer parseInt(String text) {
+        if (text.startsWith("0x") || text.startsWith("0X")) {
+            return Integer.parseInt(text, 16);
+        } else if (text.startsWith("0") && text.length() > 1) {
+            return Integer.parseInt(text, 8);
+        }
+        return Integer.parseInt(text);
     }
 }

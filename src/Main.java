@@ -17,9 +17,9 @@ public class Main
         sysYLexer.removeErrorListeners();
         sysYLexer.addErrorListener(new MyErrorListener());
         List<? extends Token> allTokens = sysYLexer.getAllTokens();
-        String[] tokenNames = sysYLexer.getTokenNames();
+        String[] tokenNames = sysYLexer.getRuleNames();
         for (Token token : allTokens) {
-            System.out.println(tokenNames[token.getType()] + " " + token.getText() + " at Line " + token.getLine() + ".");
+            System.out.println(tokenNames[token.getType() - 1] + " " + token.getText() + " at Line " + token.getLine() + ".");
         }
     }
 }

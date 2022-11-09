@@ -12,20 +12,24 @@ public class Main
             System.err.println("input path is required");
         }
         String source = args[0];
+//        String source = "hello.txt";
         CharStream input = CharStreams.fromFileName(source);
         SysYLexer sysYLexer = new SysYLexer(input);
         sysYLexer.removeErrorListeners();
-        sysYLexer.addErrorListener(new MyErrorListener());
+        MyErrorListener myErrorListener = new MyErrorListener();
+        sysYLexer.addErrorListener(myErrorListener);
         List<? extends Token> allTokens = sysYLexer.getAllTokens();
-        // 没有词法错误
-        String[] ruleNames = sysYLexer.getRuleNames();
-        for (Token token : allTokens) {
-            String ruleName = ruleNames[token.getType() - 1];
-            if (ruleName.equals("INTEGR_CONST")) {
-                Integer number = parseInt(token.getText());
-                System.err.println(ruleName + " " + number + " at Line " + token.getLine() + ".");
-            } else {
-                System.err.println(ruleName + " " + token.getText() + " at Line " + token.getLine() + ".");
+        if (! myErrorListener.used) {
+            // 没有词法错误
+            String[] ruleNames = sysYLexer.getRuleNames();
+            for (Token token : allTokens) {
+                String ruleName = ruleNames[token.getType() - 1];
+                if (ruleName.equals("INTEGR_CONST")) {
+                    Integer number = parseInt(token.getText());
+                    System.err.println(ruleName + " " + number + " at Line " + token.getLine() + ".");
+                } else {
+                    System.err.println(ruleName + " " + token.getText() + " at Line " + token.getLine() + ".");
+                }
             }
         }
     }

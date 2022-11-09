@@ -29,7 +29,9 @@ public class Main
                     System.err.println(ruleName + " " + token.getText() + " at Line " + token.getLine() + ".");
                 }
             }
-        } catch (RuntimeException ignored) {}
+        } catch (RuntimeException e) {
+
+        }
     }
 
     public static Integer parseInt(String text) {

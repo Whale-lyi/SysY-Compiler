@@ -16,20 +16,18 @@ public class Main
         SysYLexer sysYLexer = new SysYLexer(input);
         sysYLexer.removeErrorListeners();
         sysYLexer.addErrorListener(new MyErrorListener());
-        try {
-            List<? extends Token> allTokens = sysYLexer.getAllTokens();
-            // 没有词法错误
-            String[] ruleNames = sysYLexer.getRuleNames();
-            for (Token token : allTokens) {
-                String ruleName = ruleNames[token.getType() - 1];
-                if (ruleName.equals("INTEGR_CONST")) {
-                    Integer number = parseInt(token.getText());
-                    System.err.println(ruleName + " " + number + " at Line " + token.getLine() + ".");
-                } else {
-                    System.err.println(ruleName + " " + token.getText() + " at Line " + token.getLine() + ".");
-                }
+        List<? extends Token> allTokens = sysYLexer.getAllTokens();
+        // 没有词法错误
+        String[] ruleNames = sysYLexer.getRuleNames();
+        for (Token token : allTokens) {
+            String ruleName = ruleNames[token.getType() - 1];
+            if (ruleName.equals("INTEGR_CONST")) {
+                Integer number = parseInt(token.getText());
+                System.err.println(ruleName + " " + number + " at Line " + token.getLine() + ".");
+            } else {
+                System.err.println(ruleName + " " + token.getText() + " at Line " + token.getLine() + ".");
             }
-        } catch (RuntimeException ignored) {}
+        }
     }
 
     public static Integer parseInt(String text) {

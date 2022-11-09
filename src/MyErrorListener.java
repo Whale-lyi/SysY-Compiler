@@ -6,6 +6,6 @@ public class MyErrorListener extends BaseErrorListener {
     @Override
     public void syntaxError(Recognizer<?, ?> recognizer, Object offendingSymbol, int line, int charPositionInLine, String msg, RecognitionException e) {
         System.err.println("Error type A at Line " + line + ":" + msg + ".");
-        throw new RuntimeException("SyntaxError at line " + line);
+
     }
 }

@@ -19,7 +19,7 @@ public class Main
         List<? extends Token> allTokens = sysYLexer.getAllTokens();
         for (Token token : allTokens) {
             System.out.println(token.getTokenIndex() + " " + token.getChannel());
-//            System.out.println(token.getType() + " " + token.getText() + " at Line " + token.getLine() + ".");
+            System.out.println(token.getType() + " " + token.getText() + " at Line " + token.getLine() + ".");
         }
     }
 }

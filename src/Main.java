@@ -12,14 +12,19 @@ public class Main
             System.err.println("input path is required");
         }
         String source = args[0];
+//        String source = "hello.txt";
         CharStream input = CharStreams.fromFileName(source);
         SysYLexer sysYLexer = new SysYLexer(input);
         sysYLexer.removeErrorListeners();
         sysYLexer.addErrorListener(new MyErrorListener());
         List<? extends Token> allTokens = sysYLexer.getAllTokens();
-//        String[] tokenNames = sysYLexer.getRuleNames();
-//        for (Token token : allTokens) {
-//            System.out.println(tokenNames[token.getType() - 1] + " " + token.getText() + " at Line " + token.getLine() + ".");
-//        }
+        String[] ruleNames = sysYLexer.getRuleNames();
+        for (Token token : allTokens) {
+            if (token.getType() == 34) {
+                System.err.println(ruleNames[33] + " " + Integer.parseInt(token.getText()) + " at Line " + token.getLine() + ".");
+            } else {
+                System.err.println(ruleNames[token.getType() - 1] + " " + token.getText() + " at Line " + token.getLine() + ".");
+            }
+        }
     }
 }

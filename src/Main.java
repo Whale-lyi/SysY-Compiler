@@ -17,8 +17,9 @@ public class Main
         SysYLexer sysYLexer = new SysYLexer(input);
         sysYLexer.removeErrorListeners();
         sysYLexer.addErrorListener(new MyErrorListener());
-        List<? extends Token> allTokens = sysYLexer.getAllTokens();
         try {
+            List<? extends Token> allTokens = sysYLexer.getAllTokens();
+            // 没有词法错误
             String[] ruleNames = sysYLexer.getRuleNames();
             for (Token token : allTokens) {
                 String ruleName = ruleNames[token.getType() - 1];
@@ -29,8 +30,7 @@ public class Main
                     System.err.println(ruleName + " " + token.getText() + " at Line " + token.getLine() + ".");
                 }
             }
-        } catch (RuntimeException e) {
-            e.printStackTrace();
+        } catch (RuntimeException ignored) {
         }
     }
 

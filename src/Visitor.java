@@ -1,25 +1,31 @@
+import org.antlr.v4.runtime.RuleContext;
 import org.antlr.v4.runtime.tree.RuleNode;
 import org.antlr.v4.runtime.tree.TerminalNode;
 
 public class Visitor extends SysYParserBaseVisitor<Void>{
 
-    private String[] ruleNames;
+    private final String[] parserRuleNames;
+    private final String[] lexerRuleNames;
 
-    public Visitor(String[] ruleNames) {
-        this.ruleNames = ruleNames;
+    public Visitor(String[] parserRuleNames, String[] lexerRuleNames) {
+        this.parserRuleNames = parserRuleNames;
+        this.lexerRuleNames = lexerRuleNames;
     }
 
     @Override
     public Void visitChildren(RuleNode node) {
         int depth = node.getRuleContext().depth();
-        String ruleName = ruleNames[node.getRuleContext().getRuleIndex()];
-        System.out.println(getIndent(depth) + titleCase(ruleName));
+        String ruleName = parserRuleNames[node.getRuleContext().getRuleIndex()];
+        System.err.println(getIndent(depth) + titleCase(ruleName));
         return super.visitChildren(node);
     }
 
     @Override
     public Void visitTerminal(TerminalNode node) {
-//        System.out.println("visitTerminal: " + node.getSymbol().getText());
+        RuleContext ruleContext = (RuleContext) node.getParent();
+        int depth = ruleContext.depth() + 1;
+        String ruleName = lexerRuleNames[node.getSymbol().getTokenIndex()];
+        System.err.println(getIndent(depth) + node.getSymbol().getText() + " " + ruleName);
         return super.visitTerminal(node);
     }
 

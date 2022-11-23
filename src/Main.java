@@ -18,7 +18,7 @@ public class Main
         SysYParser sysYParser = new SysYParser(tokens);
         ParseTree tree = sysYParser.program();
 
-        Visitor visitor = new Visitor(sysYParser.getRuleNames());
+        Visitor visitor = new Visitor(sysYParser.getRuleNames(), sysYLexer.getRuleNames());
         visitor.visit(tree);
     }
 

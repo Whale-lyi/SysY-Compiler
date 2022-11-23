@@ -13,7 +13,7 @@ public class Visitor extends SysYParserBaseVisitor<Void>{
     public Void visitChildren(RuleNode node) {
         int depth = node.getRuleContext().depth();
         System.out.println(getIndent(depth) + ruleNames[node.getRuleContext().getRuleIndex()]);
-        return null;
+        return super.visitChildren(node);
     }
 
     @Override

@@ -38,9 +38,12 @@ public class Visitor extends SysYParserBaseVisitor<Void>{
         RuleContext ruleContext = (RuleContext) node.getParent();
         int depth = ruleContext.depth() + 1;
         int type = node.getSymbol().getType();
-        if ((type >= 1 && type <= 24) || type == 33 || type == 34) {
+        if ((type >= 1 && type <= 24) || type == 33) {
             String ruleName = lexerRuleNames[type - 1];
             System.err.println(getIndent(depth) + node.getSymbol().getText() + " " + ruleName + highLight[type - 1]);
+        } else if (type == 34) {
+            String ruleName = lexerRuleNames[type - 1];
+            System.err.println(getIndent(depth) + parseInt(node.getSymbol().getText()) + " " + ruleName + highLight[type - 1]);
         }
         return super.visitTerminal(node);
     }
@@ -51,5 +54,14 @@ public class Visitor extends SysYParserBaseVisitor<Void>{
 
     public static String titleCase(String ruleName) {
         return ruleName.substring(0, 1).toUpperCase() + ruleName.substring(1);
+    }
+
+    public static Integer parseInt(String text) {
+        if (text.startsWith("0x") || text.startsWith("0X")) {
+            return Integer.parseInt(text.substring(2), 16);
+        } else if (text.startsWith("0") && text.length() > 1) {
+            return Integer.parseInt(text.substring(1), 8);
+        }
+        return Integer.parseInt(text);
     }
 }

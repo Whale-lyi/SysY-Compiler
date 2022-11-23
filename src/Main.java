@@ -1,10 +1,9 @@
 import org.antlr.v4.runtime.CharStream;
 import org.antlr.v4.runtime.CharStreams;
 import org.antlr.v4.runtime.CommonTokenStream;
-import org.antlr.v4.runtime.Token;
+import org.antlr.v4.runtime.tree.ParseTree;
 
-import java.io.*;
-import java.util.List;
+import java.io.IOException;
 
 public class Main
 {    
@@ -14,10 +13,12 @@ public class Main
         }
         String source = args[0];
         CharStream input = CharStreams.fromFileName(source);
-//        SysYLexer sysYLexer = new SysYLexer(input);
-//        CommonTokenStream tokens = new CommonTokenStream(sysYLexer);
-//        SysYParser sysYParser = new SysYParser(tokens);
-
+        SysYLexer sysYLexer = new SysYLexer(input);
+        CommonTokenStream tokens = new CommonTokenStream(sysYLexer);
+        SysYParser sysYParser = new SysYParser(tokens);
+        ParseTree tree = sysYParser.program();
+        Visitor visitor = new Visitor();
+        visitor.visit(tree);
     }
 
     public static Integer parseInt(String text) {

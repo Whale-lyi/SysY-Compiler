@@ -17,7 +17,8 @@ public class Main
         CommonTokenStream tokens = new CommonTokenStream(sysYLexer);
         SysYParser sysYParser = new SysYParser(tokens);
         ParseTree tree = sysYParser.program();
-        Visitor visitor = new Visitor();
+
+        Visitor visitor = new Visitor(sysYParser.getRuleNames());
         visitor.visit(tree);
     }
 

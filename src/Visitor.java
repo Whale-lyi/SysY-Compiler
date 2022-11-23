@@ -2,11 +2,18 @@ import org.antlr.v4.runtime.tree.RuleNode;
 import org.antlr.v4.runtime.tree.TerminalNode;
 
 public class Visitor extends SysYParserBaseVisitor<Void>{
+
+    private String[] ruleNames;
+
+    public Visitor(String[] ruleNames) {
+        this.ruleNames = ruleNames;
+    }
+
     @Override
     public Void visitChildren(RuleNode node) {
         int depth = node.getRuleContext().depth();
-        System.out.println(getIndent(depth) + node.getText());
-        return super.visitChildren(node);
+        System.out.println(getIndent(depth) + ruleNames[node.getRuleContext().getRuleIndex()]);
+        return null;
     }
 
     @Override
@@ -16,6 +23,6 @@ public class Visitor extends SysYParserBaseVisitor<Void>{
     }
 
     public static String getIndent(int depth) {
-        return "  ".repeat(Math.max(0, depth));
+        return "  ".repeat(Math.max(0, depth - 1));
     }
 }

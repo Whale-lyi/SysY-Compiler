@@ -24,8 +24,8 @@ public class Visitor extends SysYParserBaseVisitor<Void>{
     public Void visitTerminal(TerminalNode node) {
         RuleContext ruleContext = (RuleContext) node.getParent();
         int depth = ruleContext.depth() + 1;
-        String ruleName = lexerRuleNames[node.getSymbol().getType() + 1];
-        System.err.println(getIndent(depth) + node.getSymbol().getText() + " " + ruleName);
+//        String ruleName = lexerRuleNames[node.getSymbol().getType() + 1];
+        System.err.println(getIndent(depth) + node.getSymbol().getText() + " " + node.getSymbol().getType());
         return super.visitTerminal(node);
     }
 

@@ -16,9 +16,9 @@ public class Main
         }
         String source = args[0];
         CharStream input = CharStreams.fromFileName(source);
-        SysYLexer sysYLexer = new SysYLexer(input);
-        CommonTokenStream tokens = new CommonTokenStream(sysYLexer);
-        SysYParser sysYParser = new SysYParser(tokens);
+//        SysYLexer sysYLexer = new SysYLexer(input);
+//        CommonTokenStream tokens = new CommonTokenStream(sysYLexer);
+//        SysYParser sysYParser = new SysYParser(tokens);
 
     }
 

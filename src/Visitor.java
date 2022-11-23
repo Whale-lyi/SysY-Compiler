@@ -12,7 +12,8 @@ public class Visitor extends SysYParserBaseVisitor<Void>{
     @Override
     public Void visitChildren(RuleNode node) {
         int depth = node.getRuleContext().depth();
-        System.out.println(getIndent(depth) + ruleNames[node.getRuleContext().getRuleIndex()]);
+        String ruleName = ruleNames[node.getRuleContext().getRuleIndex()];
+        System.out.println(getIndent(depth) + titleCase(ruleName));
         return super.visitChildren(node);
     }
 
@@ -24,5 +25,9 @@ public class Visitor extends SysYParserBaseVisitor<Void>{
 
     public static String getIndent(int depth) {
         return "  ".repeat(Math.max(0, depth - 1));
+    }
+
+    public static String titleCase(String ruleName) {
+        return ruleName.substring(0, 1).toUpperCase() + ruleName.substring(1);
     }
 }

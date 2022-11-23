@@ -16,10 +16,17 @@ public class Main
         SysYLexer sysYLexer = new SysYLexer(input);
         CommonTokenStream tokens = new CommonTokenStream(sysYLexer);
         SysYParser sysYParser = new SysYParser(tokens);
+
+        MyParserErrorListener myParserErrorListener = new MyParserErrorListener();
+        sysYParser.removeErrorListeners();
+        sysYParser.addErrorListener(myParserErrorListener);
+
         ParseTree tree = sysYParser.program();
 
-        Visitor visitor = new Visitor(sysYParser.getRuleNames(), sysYLexer.getRuleNames());
-        visitor.visit(tree);
+        if (!myParserErrorListener.used) {
+            Visitor visitor = new Visitor(sysYParser.getRuleNames(), sysYLexer.getRuleNames());
+            visitor.visit(tree);
+        }
     }
 
 }

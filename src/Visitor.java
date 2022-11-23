@@ -4,7 +4,8 @@ import org.antlr.v4.runtime.tree.TerminalNode;
 public class Visitor extends SysYParserBaseVisitor<Void>{
     @Override
     public Void visitChildren(RuleNode node) {
-        System.out.println("visitChildren: " + node.getRuleContext().toString());
+        int depth = node.getRuleContext().depth();
+        System.out.println(getIndent(depth) + node.getText());
         return super.visitChildren(node);
     }
 
@@ -12,5 +13,9 @@ public class Visitor extends SysYParserBaseVisitor<Void>{
     public Void visitTerminal(TerminalNode node) {
 //        System.out.println("visitTerminal: " + node.getSymbol().getText());
         return super.visitTerminal(node);
+    }
+
+    public static String getIndent(int depth) {
+        return "  ".repeat(Math.max(0, depth));
     }
 }

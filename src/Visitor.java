@@ -6,10 +6,23 @@ public class Visitor extends SysYParserBaseVisitor<Void>{
 
     private final String[] parserRuleNames;
     private final String[] lexerRuleNames;
+    private final String[] highLight;
 
     public Visitor(String[] parserRuleNames, String[] lexerRuleNames) {
         this.parserRuleNames = parserRuleNames;
         this.lexerRuleNames = lexerRuleNames;
+        this.highLight = new String[lexerRuleNames.length];
+        for (int i = 0; i < highLight.length; i++) {
+            if (i + 1 <= 9) {
+                highLight[i] = "[orange]";
+            } else if (i + 1 <= 24) {
+                highLight[i] = "[blue]";
+            } else if (i + 1 == 33) {
+                highLight[i] = "[red]";
+            } else if (i + 1 == 34) {
+                highLight[i] = "[green]";
+            }
+        }
     }
 
     @Override
@@ -24,8 +37,11 @@ public class Visitor extends SysYParserBaseVisitor<Void>{
     public Void visitTerminal(TerminalNode node) {
         RuleContext ruleContext = (RuleContext) node.getParent();
         int depth = ruleContext.depth() + 1;
-//        String ruleName = lexerRuleNames[node.getSymbol().getType() + 1];
-        System.err.println(getIndent(depth) + node.getSymbol().getText() + " " + node.getSymbol().getType());
+        int type = node.getSymbol().getType();
+        if ((type >= 1 && type <= 24) || type == 33 || type == 34) {
+            String ruleName = lexerRuleNames[type - 1];
+            System.err.println(getIndent(depth) + node.getSymbol().getText() + " " + ruleName + highLight[type - 1]);
+        }
         return super.visitTerminal(node);
     }
 

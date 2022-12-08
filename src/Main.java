@@ -26,7 +26,7 @@ public class Main {
         ParseTree tree = sysYParser.program();
 
         if (!myParserErrorListener.used) {
-            Visitor visitor = new Visitor(sysYParser.getRuleNames(), sysYLexer.getRuleNames());
+//            Visitor visitor = new Visitor(sysYParser.getRuleNames(), sysYLexer.getRuleNames());
             visitor.visit(tree);
         }
     }

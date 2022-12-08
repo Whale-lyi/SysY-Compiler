@@ -27,7 +27,7 @@ public class Main {
 
         if (!myParserErrorListener.used) {
 //            Visitor visitor = new Visitor(sysYParser.getRuleNames(), sysYLexer.getRuleNames());
-            visitor.visit(tree);
+//            visitor.visit(tree);
         }
     }
 

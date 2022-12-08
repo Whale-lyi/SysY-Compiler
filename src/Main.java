@@ -3,7 +3,6 @@ import org.antlr.v4.runtime.CharStream;
 import org.antlr.v4.runtime.CharStreams;
 import org.antlr.v4.runtime.CommonTokenStream;
 import org.antlr.v4.runtime.tree.ParseTree;
-//import visitor.Visitor;
 
 import java.io.IOException;
 
@@ -26,8 +25,8 @@ public class Main {
         ParseTree tree = sysYParser.program();
 
         if (!myParserErrorListener.used) {
-//            Visitor visitor = new Visitor(sysYParser.getRuleNames(), sysYLexer.getRuleNames());
-//            visitor.visit(tree);
+            Visitor visitor = new Visitor(sysYParser.getRuleNames(), sysYLexer.getRuleNames());
+            visitor.visit(tree);
         }
     }
 

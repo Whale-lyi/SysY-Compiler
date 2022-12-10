@@ -13,8 +13,8 @@ compUnit
    ;
 
 decl
-   : constDecl
-   | varDecl
+   : constDecl  # ConstDeclStat
+   | varDecl    # VarDeclStat
    ;
 
 constDecl
@@ -30,8 +30,8 @@ constDef
    ;
 
 constInitVal
-   : constExp
-   | L_BRACE (constInitVal (COMMA constInitVal)*)? R_BRACE
+   : constExp                                               # ExpConstInitVal
+   | L_BRACE (constInitVal (COMMA constInitVal)*)? R_BRACE  # ArrayConstInitVal
    ;
 
 varDecl
@@ -39,13 +39,13 @@ varDecl
    ;
 
 varDef
-   : IDENT (L_BRACKT constExp R_BRACKT)*
-   | IDENT (L_BRACKT constExp R_BRACKT)* ASSIGN initVal
+   : IDENT (L_BRACKT constExp R_BRACKT)*                    # VarDefWithAssign
+   | IDENT (L_BRACKT constExp R_BRACKT)* ASSIGN initVal     # VarDefWithoutAssign
    ;
 
 initVal
-   : exp
-   | L_BRACE (initVal (COMMA initVal)*)? R_BRACE
+   : exp                                            # ExpInitVal
+   | L_BRACE (initVal (COMMA initVal)*)? R_BRACE    # ArrayInitVal
    ;
 
 funcDef
@@ -53,8 +53,8 @@ funcDef
    ;
 
 funcType
-   : VOID
-   | INT
+   : VOID   # Void
+   | INT    # Int
    ;
 
 funcFParams
@@ -70,37 +70,37 @@ block
    ;
 
 blockItem
-   : decl
-   | stmt
+   : decl   # DeclStat
+   | stmt   # Stat
    ;
 
 stmt
-   : lVal ASSIGN exp SEMICOLON
-   | (exp)? SEMICOLON
-   | block
-   | IF L_PAREN cond R_PAREN stmt (ELSE stmt)?
-   | WHILE L_PAREN cond R_PAREN stmt
-   | BREAK SEMICOLON
-   | CONTINUE SEMICOLON
-   | RETURN (exp)? SEMICOLON
+   : lVal ASSIGN exp SEMICOLON                  # AssignStat
+   | (exp)? SEMICOLON                           # ExpStat
+   | block                                      # BlockStat
+   | IF L_PAREN cond R_PAREN stmt (ELSE stmt)?  # IfStat
+   | WHILE L_PAREN cond R_PAREN stmt            # WhileStat
+   | BREAK SEMICOLON                            # BreakStat
+   | CONTINUE SEMICOLON                         # ContinueStat
+   | RETURN (exp)? SEMICOLON                    # ReturnStat
    ;
 
 exp
-   : L_PAREN exp R_PAREN
-   | lVal
-   | number
-   | IDENT L_PAREN funcRParams? R_PAREN
-   | unaryOp exp
-   | exp (MUL | DIV | MOD) exp
-   | exp (PLUS | MINUS) exp
+   : L_PAREN exp R_PAREN                        # ParenExp
+   | lVal                                       # LeftValExp
+   | number                                     # IntegerExp
+   | IDENT L_PAREN funcRParams? R_PAREN         # FuncCallExp
+   | unaryOp exp                                # UnaryOpExp
+   | exp (op = MUL | op = DIV | op = MOD) exp   # MulDivModExp
+   | exp (op = PLUS | op = MINUS) exp           # AddSubExp
    ;
 
 cond
-   : exp
-   | cond (LT | GT | LE | GE) cond
-   | cond (EQ | NEQ) cond
-   | cond AND cond
-   | cond OR cond
+   : exp                                                # ExpCond
+   | cond (op = LT | op = GT | op = LE | op = GE) cond  # LTGTLEGECond
+   | cond (op = EQ | op = NEQ) cond                     # EQNEQCond
+   | cond AND cond                                      # AndCond
+   | cond OR cond                                       # OrCond
    ;
 
 lVal
@@ -112,9 +112,9 @@ number
    ;
 
 unaryOp
-   : PLUS
-   | MINUS
-   | NOT
+   : PLUS   # Plus
+   | MINUS  # Minus
+   | NOT    # Not
    ;
 
 funcRParams

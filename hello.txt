@@ -8,8 +8,8 @@ int a(){
 
 int main(){
     b = c();
-    int test1;
-    int test1;
+    const int test1;
+    const int test1;
     int array[2] = {0,0};
     test1 = array;
     test1 = a + array;

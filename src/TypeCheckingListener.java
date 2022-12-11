@@ -32,10 +32,11 @@ public class TypeCheckingListener extends SysYParserBaseListener {
         // 声明函数符号
         String funName = ctx.IDENT().getText();
         ArrayList<Type> paramsType = new ArrayList<>();
-        for (SysYParser.FuncFParamContext paramContext : ctx.funcFParams().funcFParam()) {
-
-            // TODO: 检查节点级别是否正确
-            paramsType.add(arrayTypeProperty.get(paramContext.IDENT()));
+        if (ctx.funcFParams().funcFParam() != null) {
+            for (SysYParser.FuncFParamContext paramContext : ctx.funcFParams().funcFParam()) {
+                // TODO: 检查节点级别是否正确
+                paramsType.add(arrayTypeProperty.get(paramContext.IDENT()));
+            }
         }
         FunctionType functionType = new FunctionType(new BasicTypeSymbol(typeName), paramsType);
         FunctionSymbol fun = new FunctionSymbol(currentScope, funName, functionType);

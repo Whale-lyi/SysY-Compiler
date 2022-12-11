@@ -1,10 +1,10 @@
-package listener;
+package errorlistener;
 
 import org.antlr.v4.runtime.BaseErrorListener;
 import org.antlr.v4.runtime.RecognitionException;
 import org.antlr.v4.runtime.Recognizer;
 
-public class MyTypeErrorListener extends BaseErrorListener {
+public class MyParserErrorListener extends BaseErrorListener {
     public boolean used = false;
 
     @Override

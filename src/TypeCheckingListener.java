@@ -32,7 +32,7 @@ public class TypeCheckingListener extends SysYParserBaseListener {
         // 声明函数符号
         String funName = ctx.IDENT().getText();
         ArrayList<Type> paramsType = new ArrayList<>();
-        if (ctx.funcFParams().funcFParam() != null) {
+        if (ctx.funcFParams() != null) {
             for (SysYParser.FuncFParamContext paramContext : ctx.funcFParams().funcFParam()) {
                 // TODO: 检查节点级别是否正确
                 paramsType.add(arrayTypeProperty.get(paramContext.IDENT()));

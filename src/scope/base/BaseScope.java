@@ -43,7 +43,6 @@ public class BaseScope implements Scope{
         if (enclosingScope != null) {
             return enclosingScope.resolve(name);
         }
-        System.err.println("Cannot find " + name);
         return null;
     }
 }

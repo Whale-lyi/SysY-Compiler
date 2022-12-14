@@ -91,8 +91,8 @@ exp
    | number                                     # IntegerExp
    | IDENT L_PAREN funcRParams? R_PAREN         # FuncCallExp
    | unaryOp exp                                # UnaryOpExp
-   | lhs = exp (op = MUL | op = DIV | op = MOD) lhs = exp   # MulDivModExp
-   | lhs = exp (op = PLUS | op = MINUS) lhs = exp           # AddSubExp
+   | lhs = exp (op = MUL | op = DIV | op = MOD) rhs = exp   # MulDivModExp
+   | lhs = exp (op = PLUS | op = MINUS) rhs = exp           # AddSubExp
    ;
 
 cond

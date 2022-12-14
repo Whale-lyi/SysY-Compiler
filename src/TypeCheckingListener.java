@@ -1,4 +1,5 @@
 import org.antlr.v4.runtime.tree.ParseTreeProperty;
+import org.antlr.v4.runtime.tree.TerminalNode;
 import scope.GlobalScope;
 import scope.LocalScope;
 import scope.base.Scope;
@@ -213,9 +214,16 @@ public class TypeCheckingListener extends SysYParserBaseListener {
             System.err.println("Error type 1 at Line " + ctx.IDENT().getSymbol().getLine() + ": Undefined variable: " + ctx.IDENT().getText());
         } else {
             if (!resolve.getType().getIsArray()) {
-                hasError = true;
-                System.err.println("Error type 9 at Line " + ctx.IDENT().getSymbol().getLine() + ": Not an array: " + ctx.IDENT().getText());
+                // 变量
+                List<TerminalNode> lBrackt = ctx.L_BRACKT();
+                if(lBrackt != null && lBrackt.size() > 0) {
+                    hasError = true;
+                    System.err.println("Error type 9 at Line " + ctx.IDENT().getSymbol().getLine() + ": Not an array: " + ctx.IDENT().getText());
+                }
+                typeProperty.put(ctx, resolve.getType());
+                lineProperty.put(ctx, ctx.IDENT().getSymbol().getLine());
             } else {
+                // 数组
                 resolve.addPosition(new Position(ctx.IDENT().getSymbol().getLine(), ctx.IDENT().getSymbol().getCharPositionInLine()));
                 Type type = resolve.getType();
                 if (ctx.exp() != null && ctx.exp().size() > 0) {

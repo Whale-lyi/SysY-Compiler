@@ -39,8 +39,8 @@ varDecl
    ;
 
 varDef
-   : IDENT (L_BRACKT constExp R_BRACKT)*                    # VarDefWithAssign
-   | IDENT (L_BRACKT constExp R_BRACKT)* ASSIGN initVal     # VarDefWithoutAssign
+   : IDENT (L_BRACKT constExp R_BRACKT)*                    # VarDefWithoutAssign
+   | IDENT (L_BRACKT constExp R_BRACKT)* ASSIGN initVal     # VarDefWithAssign
    ;
 
 initVal

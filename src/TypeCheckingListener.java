@@ -98,7 +98,9 @@ public class TypeCheckingListener extends SysYParserBaseListener {
                 break;
             }
         }
-        currentScope = currentScope.getEnclosingScope();
+        if (currentScope != globalScope) {
+            currentScope = currentScope.getEnclosingScope();
+        }
     }
 
     @Override
@@ -146,6 +148,55 @@ public class TypeCheckingListener extends SysYParserBaseListener {
         }
     }
 
+    @Override
+    public void exitVarDefWithAssign(SysYParser.VarDefWithAssignContext ctx) {
+        String typeName = ((SysYParser.VarDeclContext) ctx.parent).bType().getText();
+        String varName = ctx.IDENT().getText();
+        // 检查重复定义
+        Symbol resolve = currentScope.resolveInCurScope(varName);
+        if (resolve != null) {
+            hasError = true;
+            System.err.println("Error type 3 at Line " + ctx.IDENT().getSymbol().getLine() + ": Redefined variable: " + varName);
+        } else {
+            List<SysYParser.ConstExpContext> constExpContexts = ctx.constExp();
+            // 变量
+            Type type = new BasicTypeSymbol(typeName);
+            if (constExpContexts != null && constExpContexts.size() > 0) {
+                // 数组
+                for (int i = constExpContexts.size() - 1; i >= 0; i--) {
+                    type = new ArrayType(expValueProperty.get(constExpContexts.get(i).exp()) + 1, type);
+                }
+            }
+            VariableSymbol varSymbol = new VariableSymbol(varName, type, false);
+            currentScope.define(varSymbol);
+            varSymbol.addPosition(new Position(ctx.IDENT().getSymbol().getLine(), ctx.IDENT().getSymbol().getCharPositionInLine()));
+        }
+    }
+
+    @Override
+    public void exitVarDefWithoutAssign(SysYParser.VarDefWithoutAssignContext ctx) {
+        String typeName = ((SysYParser.VarDeclContext) ctx.parent).bType().getText();
+        String varName = ctx.IDENT().getText();
+        // 检查重复定义
+        Symbol resolve = currentScope.resolveInCurScope(varName);
+        if (resolve != null) {
+            hasError = true;
+            System.err.println("Error type 3 at Line " + ctx.IDENT().getSymbol().getLine() + ": Redefined variable: " + varName);
+        } else {
+            List<SysYParser.ConstExpContext> constExpContexts = ctx.constExp();
+            // 变量
+            Type type = new BasicTypeSymbol(typeName);
+            if (constExpContexts != null && constExpContexts.size() > 0) {
+                // 数组
+                for (int i = constExpContexts.size() - 1; i >= 0; i--) {
+                    type = new ArrayType(expValueProperty.get(constExpContexts.get(i).exp()) + 1, type);
+                }
+            }
+            VariableSymbol varSymbol = new VariableSymbol(varName, type, false);
+            currentScope.define(varSymbol);
+            varSymbol.addPosition(new Position(ctx.IDENT().getSymbol().getLine(), ctx.IDENT().getSymbol().getCharPositionInLine()));
+        }
+    }
 
     /**
      * (4) When to resolve symbols?

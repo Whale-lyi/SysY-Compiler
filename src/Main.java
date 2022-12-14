@@ -3,6 +3,7 @@ import org.antlr.v4.runtime.CharStreams;
 import org.antlr.v4.runtime.CommonTokenStream;
 import org.antlr.v4.runtime.tree.ParseTree;
 import org.antlr.v4.runtime.tree.ParseTreeWalker;
+import symbol.base.Position;
 
 import java.io.IOException;
 
@@ -19,11 +20,11 @@ public class Main {
         ParseTree tree = sysYParser.program();
 
         ParseTreeWalker parseTreeWalker = new ParseTreeWalker();
-        TypeCheckingListener typeCheckingListener = new TypeCheckingListener();
+        TypeCheckingListener typeCheckingListener = new TypeCheckingListener(new Position(Integer.parseInt(args[1]), Integer.parseInt(args[2])));
         parseTreeWalker.walk(typeCheckingListener, tree);
 
         if (!typeCheckingListener.hasError) {
-            Visitor visitor = new Visitor(sysYParser.getRuleNames(), sysYLexer.getRuleNames());
+            Visitor visitor = new Visitor(sysYParser.getRuleNames(), sysYLexer.getRuleNames(), typeCheckingListener.getSymbol());
             visitor.visit(tree);
         }
     }

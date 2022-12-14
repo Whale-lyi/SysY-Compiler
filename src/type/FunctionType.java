@@ -7,9 +7,13 @@ import java.util.ArrayList;
 
 public class FunctionType extends BaseType {
     private final Type retTy;
-    private final ArrayList<Type> paramsType;
+    private ArrayList<Type> paramsType;
     public FunctionType(Type retTy, ArrayList<Type> paramsType) {
         this.retTy = retTy;
+        this.paramsType = paramsType;
+    }
+
+    public void setParamsType(ArrayList<Type> paramsType) {
         this.paramsType = paramsType;
     }
 

@@ -1,14 +1,16 @@
 import org.antlr.v4.runtime.RuleContext;
 import org.antlr.v4.runtime.tree.RuleNode;
 import org.antlr.v4.runtime.tree.TerminalNode;
+import symbol.base.Symbol;
 
 public class Visitor extends SysYParserBaseVisitor<Void>{
 
     private final String[] parserRuleNames;
     private final String[] lexerRuleNames;
     private final String[] highLight;
+    private final Symbol symbol;
 
-    public Visitor(String[] parserRuleNames, String[] lexerRuleNames) {
+    public Visitor(String[] parserRuleNames, String[] lexerRuleNames, Symbol symbol) {
         this.parserRuleNames = parserRuleNames;
         this.lexerRuleNames = lexerRuleNames;
         this.highLight = new String[lexerRuleNames.length];
@@ -23,6 +25,7 @@ public class Visitor extends SysYParserBaseVisitor<Void>{
                 highLight[i] = "[green]";
             }
         }
+        this.symbol = symbol;
     }
 
     @Override

@@ -35,4 +35,9 @@ public class FunctionSymbol extends BaseScope implements Symbol {
         }
         return false;
     }
+
+    @Override
+    public ArrayList<Position> getPositions() {
+        return positions;
+    }
 }

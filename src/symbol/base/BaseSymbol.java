@@ -30,13 +30,13 @@ public class BaseSymbol implements Symbol{
     @Override
     public boolean checkPosition(Position position) {
         for (Position pos : positions) {
-            if (pos.equals(position)) {
+            if (pos.getX() == position.getX() && pos.getY() == position.getY()) {
                 return true;
             }
         }
         return false;
     }
-
+    @Override
     public ArrayList<Position> getPositions() {
         return positions;
     }

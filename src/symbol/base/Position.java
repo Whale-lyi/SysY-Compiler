@@ -16,15 +16,4 @@ public class Position {
     public int getY() {
         return y;
     }
-
-    @Override
-    public boolean equals(Object obj) {
-        if (obj instanceof Position) {
-            Position another = (Position) obj;
-            return ((this.x == another.getX()) && (this.y == another.getY()));
-        } else {
-            System.err.println("Type error");
-            return false;
-        }
-    }
 }

@@ -10,4 +10,5 @@ public interface Scope {
     Map<String, Symbol> getSymbols();
     void define(Symbol symbol);
     Symbol resolve(String name);
+    Symbol resolveInCurScope(String name);
 }

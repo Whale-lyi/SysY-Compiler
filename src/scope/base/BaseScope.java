@@ -45,4 +45,13 @@ public class BaseScope implements Scope{
         }
         return null;
     }
+
+    @Override
+    public Symbol resolveInCurScope(String name) {
+        Symbol symbol = symbols.get(name);
+        if (symbol != null) {
+            return symbol;
+        }
+        return null;
+    }
 }

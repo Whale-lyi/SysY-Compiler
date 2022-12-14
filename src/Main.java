@@ -20,7 +20,8 @@ public class Main {
         ParseTree tree = sysYParser.program();
 
         ParseTreeWalker parseTreeWalker = new ParseTreeWalker();
-        TypeCheckingListener typeCheckingListener = new TypeCheckingListener(new Position(Integer.parseInt(args[1]), Integer.parseInt(args[2])));
+        TypeCheckingListener typeCheckingListener = new TypeCheckingListener(new Position(0, 0));
+//        TypeCheckingListener typeCheckingListener = new TypeCheckingListener(new Position(Integer.parseInt(args[1]), Integer.parseInt(args[2])));
         parseTreeWalker.walk(typeCheckingListener, tree);
 
         if (!typeCheckingListener.hasError) {

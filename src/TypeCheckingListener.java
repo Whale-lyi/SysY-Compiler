@@ -17,9 +17,10 @@ public class TypeCheckingListener extends SysYParserBaseListener {
     public boolean hasError = false;
     private GlobalScope globalScope = null;
     private Scope currentScope = null;
-    private Position position;
+    private final Position position;
     private final ParseTreeProperty<Type> typeProperty = new ParseTreeProperty<>();
     private final ParseTreeProperty<Integer> expValueProperty = new ParseTreeProperty<>();
+    private final ParseTreeProperty<Integer> lineProperty = new ParseTreeProperty<>();
     private Symbol symbol;
 
     public TypeCheckingListener(Position position) {
@@ -173,6 +174,7 @@ public class TypeCheckingListener extends SysYParserBaseListener {
                     }
                 }
                 typeProperty.put(ctx, type);
+                lineProperty.put(ctx, ctx.IDENT().getSymbol().getLine());
             }
         }
     }
@@ -201,50 +203,62 @@ public class TypeCheckingListener extends SysYParserBaseListener {
 
     @Override
     public void exitMulDivModExp(SysYParser.MulDivModExpContext ctx) {
-        int lvalue = expValueProperty.get(ctx.lhs);
-        int rvalue = expValueProperty.get(ctx.rhs);
-        if (ctx.op.getType() == SysYParser.MUL) {
-            expValueProperty.put(ctx, lvalue * rvalue);
-        } else if (ctx.op.getType() == SysYParser.DIV) {
-            expValueProperty.put(ctx, lvalue / rvalue);
-        } else if (ctx.op.getType() == SysYParser.MOD) {
-            expValueProperty.put(ctx, lvalue % rvalue);
+        Type lvalue = typeProperty.get(ctx.lhs);
+        Type rvalue = typeProperty.get(ctx.rhs);
+        if (lvalue != null && rvalue != null) {
+            if (lvalue.getIsArray() || lvalue.getIsFunction()) {
+                hasError = true;
+                System.err.println("Error type 6 at Line " + lineProperty.get(ctx.lhs) + ": type.Type mismatched for operands.");
+            } else if (rvalue.getIsArray() || rvalue.getIsFunction()) {
+                hasError = true;
+                System.err.println("Error type 6 at Line " + lineProperty.get(ctx.rhs) + ": type.Type mismatched for operands.");
+            }
         }
     }
 
     @Override
     public void exitLeftValExp(SysYParser.LeftValExpContext ctx) {
-        expValueProperty.put(ctx, expValueProperty.get(ctx.lVal()));
+        typeProperty.put(ctx, typeProperty.get(ctx.lVal()));
+        lineProperty.put(ctx, lineProperty.get(ctx.lVal()));
     }
 
     @Override
     public void exitIntegerExp(SysYParser.IntegerExpContext ctx) {
         expValueProperty.put(ctx, Visitor.parseInt(ctx.number().INTEGR_CONST().getText()));
+        typeProperty.put(ctx, new BasicTypeSymbol("int"));
+        lineProperty.put(ctx, ctx.number().INTEGR_CONST().getSymbol().getLine());
     }
 
     @Override
     public void exitParenExp(SysYParser.ParenExpContext ctx) {
         expValueProperty.put(ctx, expValueProperty.get(ctx.exp()));
+        typeProperty.put(ctx, typeProperty.get(ctx.exp()));
+        lineProperty.put(ctx, lineProperty.get(ctx.exp()));
     }
 
     @Override
     public void exitUnaryOpExp(SysYParser.UnaryOpExpContext ctx) {
-        String op = ctx.unaryOp().getText();
-        if ("+".equals(op)) {
-            expValueProperty.put(ctx, expValueProperty.get(ctx.exp()));
-        } else if ("-".equals(op)) {
-            expValueProperty.put(ctx, -expValueProperty.get(ctx.exp()));
+        Type type = typeProperty.get(ctx.exp());
+        if (type != null) {
+            if (type.getIsArray() || type.getIsFunction()) {
+                hasError = true;
+                System.err.println("Error type 6 at Line " + lineProperty.get(ctx.exp()) + ": type.Type mismatched for operands.");
+            }
         }
     }
 
     @Override
     public void exitAddSubExp(SysYParser.AddSubExpContext ctx) {
-        int lvalue = expValueProperty.get(ctx.lhs);
-        int rvalue = expValueProperty.get(ctx.rhs);
-        if (ctx.op.getType() == SysYParser.PLUS) {
-            expValueProperty.put(ctx, lvalue + rvalue);
-        } else if (ctx.op.getType() == SysYParser.MINUS) {
-            expValueProperty.put(ctx, lvalue - rvalue);
+        Type lvalue = typeProperty.get(ctx.lhs);
+        Type rvalue = typeProperty.get(ctx.rhs);
+        if (lvalue != null && rvalue != null) {
+            if (lvalue.getIsArray() || lvalue.getIsFunction()) {
+                hasError = true;
+                System.err.println("Error type 6 at Line " + lineProperty.get(ctx.lhs) + ": type.Type mismatched for operands.");
+            } else if (rvalue.getIsArray() || rvalue.getIsFunction()) {
+                hasError = true;
+                System.err.println("Error type 6 at Line " + lineProperty.get(ctx.rhs) + ": type.Type mismatched for operands.");
+            }
         }
     }
 

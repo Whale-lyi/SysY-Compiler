@@ -203,6 +203,12 @@ public class TypeCheckingListener extends SysYParserBaseListener {
      * (4) When to resolve symbols?
      */
 
+    @Override
+    public void exitAssignStat(SysYParser.AssignStatContext ctx) {
+        Type type = typeProperty.get(ctx.lVal());
+
+    }
+
     /**
      * lVal
      */
@@ -213,16 +219,18 @@ public class TypeCheckingListener extends SysYParserBaseListener {
             hasError = true;
             System.err.println("Error type 1 at Line " + ctx.IDENT().getSymbol().getLine() + ": Undefined variable: " + ctx.IDENT().getText());
         } else {
-            if (!resolve.getType().getIsArray()) {
+            if (!resolve.getType().getIsArray() && !resolve.getType().getIsFunction()) {
                 // 变量
                 List<TerminalNode> lBrackt = ctx.L_BRACKT();
                 if(lBrackt != null && lBrackt.size() > 0) {
                     hasError = true;
                     System.err.println("Error type 9 at Line " + ctx.IDENT().getSymbol().getLine() + ": Not an array: " + ctx.IDENT().getText());
+                } else {
+                    resolve.addPosition(new Position(ctx.IDENT().getSymbol().getLine(), ctx.IDENT().getSymbol().getCharPositionInLine()));
+                    typeProperty.put(ctx, resolve.getType());
+                    lineProperty.put(ctx, ctx.IDENT().getSymbol().getLine());
                 }
-                typeProperty.put(ctx, resolve.getType());
-                lineProperty.put(ctx, ctx.IDENT().getSymbol().getLine());
-            } else {
+            } else if (resolve.getType().getIsArray()){
                 // 数组
                 resolve.addPosition(new Position(ctx.IDENT().getSymbol().getLine(), ctx.IDENT().getSymbol().getCharPositionInLine()));
                 Type type = resolve.getType();
@@ -234,6 +242,10 @@ public class TypeCheckingListener extends SysYParserBaseListener {
                 }
                 typeProperty.put(ctx, type);
                 lineProperty.put(ctx, ctx.IDENT().getSymbol().getLine());
+            } else if (resolve.getType().getIsFunction()) {
+                // 函数
+                hasError = true;
+                System.err.println("Error type 11 at Line " + ctx.IDENT().getSymbol().getLine() + ": The left-hand side of an assignment must be a variable.");
             }
         }
     }

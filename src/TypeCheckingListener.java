@@ -200,6 +200,17 @@ public class TypeCheckingListener extends SysYParserBaseListener {
         }
     }
 
+    @Override
+    public void exitReturnStat(SysYParser.ReturnStatContext ctx) {
+        Type type = typeProperty.get(ctx.exp());
+        if (type != null) {
+            if (type.getIsArray() || type.getIsFunction()) {
+                hasError = true;
+                System.err.println("Error type 7 at Line " + ctx.RETURN().getSymbol().getLine() + ": type.Type mismatched for return.");
+            }
+        }
+    }
+
     /**
      * (4) When to resolve symbols?
      */

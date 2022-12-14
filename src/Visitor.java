@@ -1,6 +1,7 @@
 import org.antlr.v4.runtime.RuleContext;
 import org.antlr.v4.runtime.tree.RuleNode;
 import org.antlr.v4.runtime.tree.TerminalNode;
+import symbol.base.Position;
 import symbol.base.Symbol;
 
 public class Visitor extends SysYParserBaseVisitor<Void>{
@@ -9,8 +10,9 @@ public class Visitor extends SysYParserBaseVisitor<Void>{
     private final String[] lexerRuleNames;
     private final String[] highLight;
     private final Symbol symbol;
+    private final String newName;
 
-    public Visitor(String[] parserRuleNames, String[] lexerRuleNames, Symbol symbol) {
+    public Visitor(String[] parserRuleNames, String[] lexerRuleNames, Symbol symbol, String newName) {
         this.parserRuleNames = parserRuleNames;
         this.lexerRuleNames = lexerRuleNames;
         this.highLight = new String[lexerRuleNames.length];
@@ -26,6 +28,7 @@ public class Visitor extends SysYParserBaseVisitor<Void>{
             }
         }
         this.symbol = symbol;
+        this.newName = newName;
     }
 
     @Override
@@ -42,8 +45,14 @@ public class Visitor extends SysYParserBaseVisitor<Void>{
         int depth = ruleContext.depth() + 1;
         int type = node.getSymbol().getType();
         if ((type >= 1 && type <= 24) || type == 33) {
-            String ruleName = lexerRuleNames[type - 1];
-            System.err.println(getIndent(depth) + node.getSymbol().getText() + " " + ruleName + highLight[type - 1]);
+            Position position = new Position(node.getSymbol().getLine(), node.getSymbol().getCharPositionInLine());
+            if (symbol.checkPosition(position)) {
+                String ruleName = lexerRuleNames[type - 1];
+                System.err.println(getIndent(depth) + newName + " " + ruleName + highLight[type - 1]);
+            } else {
+                String ruleName = lexerRuleNames[type - 1];
+                System.err.println(getIndent(depth) + node.getSymbol().getText() + " " + ruleName + highLight[type - 1]);
+            }
         } else if (type == 34) {
             String ruleName = lexerRuleNames[type - 1];
             System.err.println(getIndent(depth) + parseInt(node.getSymbol().getText()) + " " + ruleName + highLight[type - 1]);

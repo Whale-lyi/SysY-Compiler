@@ -26,7 +26,7 @@ public class Main {
         parseTreeWalker.walk(typeCheckingListener, tree);
 
         if (!typeCheckingListener.hasError) {
-            Visitor visitor = new Visitor(sysYParser.getRuleNames(), sysYLexer.getRuleNames(), typeCheckingListener.getSymbol());
+            Visitor visitor = new Visitor(sysYParser.getRuleNames(), sysYLexer.getRuleNames(), typeCheckingListener.getSymbol(), args[3]);
             visitor.visit(tree);
         }
     }

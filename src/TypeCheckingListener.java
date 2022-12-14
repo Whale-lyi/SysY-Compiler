@@ -205,8 +205,32 @@ public class TypeCheckingListener extends SysYParserBaseListener {
 
     @Override
     public void exitAssignStat(SysYParser.AssignStatContext ctx) {
-        Type type = typeProperty.get(ctx.lVal());
-
+        Type lValType = typeProperty.get(ctx.lVal());
+        Type expType = typeProperty.get(ctx.exp());
+        if (lValType != null && expType != null) {
+            if (lValType.getIsFunction()) {
+                // 函数
+                hasError = true;
+                System.err.println("Error type 11 at Line " + ctx.lVal().IDENT().getSymbol().getLine() + ": The left-hand side of an assignment must be a variable.");
+            } else if (lValType.getIsArray()){
+                // 数组
+                if (expType.getIsArray()) {
+                    if (lValType.getLevel() != expType.getLevel()) {
+                        hasError = true;
+                        System.err.println("Error type 5 at Line " + ctx.lVal().IDENT().getSymbol().getLine() + ": type.Type mismatched for assignment.");
+                    }
+                } else {
+                    hasError = true;
+                    System.err.println("Error type 5 at Line " + ctx.lVal().IDENT().getSymbol().getLine() + ": type.Type mismatched for assignment.");
+                }
+            } else {
+                // 变量
+                if (expType.getIsArray() || expType.getIsFunction()) {
+                    hasError = true;
+                    System.err.println("Error type 5 at Line " + ctx.lVal().IDENT().getSymbol().getLine() + ": type.Type mismatched for assignment.");
+                }
+            }
+        }
     }
 
     /**
@@ -232,20 +256,30 @@ public class TypeCheckingListener extends SysYParserBaseListener {
                 }
             } else if (resolve.getType().getIsArray()){
                 // 数组
+                boolean temp = true;
                 resolve.addPosition(new Position(ctx.IDENT().getSymbol().getLine(), ctx.IDENT().getSymbol().getCharPositionInLine()));
                 Type type = resolve.getType();
                 if (ctx.exp() != null && ctx.exp().size() > 0) {
                     for (SysYParser.ExpContext exp : ctx.exp()) {
                         //TODO: 比较是否越界
-                        type = ((ArrayType) type).getSubType();
+                        if (type.getIsArray()) {
+                            type = ((ArrayType) type).getSubType();
+                        } else {
+                            temp = false;
+                            hasError = true;
+                            System.err.println("Error type 9 at Line " + ctx.IDENT().getSymbol().getLine() + ": Not an array: " + ctx.IDENT().getText());
+                        }
                     }
                 }
-                typeProperty.put(ctx, type);
-                lineProperty.put(ctx, ctx.IDENT().getSymbol().getLine());
+                if (temp) {
+                    typeProperty.put(ctx, type);
+                    lineProperty.put(ctx, ctx.IDENT().getSymbol().getLine());
+                }
             } else if (resolve.getType().getIsFunction()) {
                 // 函数
-                hasError = true;
-                System.err.println("Error type 11 at Line " + ctx.IDENT().getSymbol().getLine() + ": The left-hand side of an assignment must be a variable.");
+                resolve.addPosition(new Position(ctx.IDENT().getSymbol().getLine(), ctx.IDENT().getSymbol().getCharPositionInLine()));
+                typeProperty.put(ctx, resolve.getType());
+                lineProperty.put(ctx, ctx.IDENT().getSymbol().getLine());
             }
         }
     }
@@ -277,12 +311,15 @@ public class TypeCheckingListener extends SysYParserBaseListener {
         Type lvalue = typeProperty.get(ctx.lhs);
         Type rvalue = typeProperty.get(ctx.rhs);
         if (lvalue != null && rvalue != null) {
+            // TODO: 报几次错
             if (lvalue.getIsArray() || lvalue.getIsFunction()) {
                 hasError = true;
                 System.err.println("Error type 6 at Line " + lineProperty.get(ctx.lhs) + ": type.Type mismatched for operands.");
             } else if (rvalue.getIsArray() || rvalue.getIsFunction()) {
                 hasError = true;
                 System.err.println("Error type 6 at Line " + lineProperty.get(ctx.rhs) + ": type.Type mismatched for operands.");
+            } else {
+                typeProperty.put(ctx, lvalue);
             }
         }
     }
@@ -314,6 +351,8 @@ public class TypeCheckingListener extends SysYParserBaseListener {
             if (type.getIsArray() || type.getIsFunction()) {
                 hasError = true;
                 System.err.println("Error type 6 at Line " + lineProperty.get(ctx.exp()) + ": type.Type mismatched for operands.");
+            } else {
+                typeProperty.put(ctx, type);
             }
         }
     }
@@ -329,6 +368,8 @@ public class TypeCheckingListener extends SysYParserBaseListener {
             } else if (rvalue.getIsArray() || rvalue.getIsFunction()) {
                 hasError = true;
                 System.err.println("Error type 6 at Line " + lineProperty.get(ctx.rhs) + ": type.Type mismatched for operands.");
+            } else {
+                typeProperty.put(ctx, lvalue);
             }
         }
     }

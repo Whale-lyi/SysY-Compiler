@@ -54,14 +54,14 @@ public class TypeCheckingListener extends SysYParserBaseListener {
 //                }
 //            }
 //        }
-        FunctionType functionType = new FunctionType(new BasicTypeSymbol(typeName), null);
-        FunctionSymbol fun = new FunctionSymbol(currentScope, funName, functionType);
         // 检查是否重复定义
         Symbol resolve = currentScope.resolve(funName);
         if (resolve != null) {
             hasError = true;
             System.err.println("Error type 4 at Line " + ctx.IDENT().getSymbol().getLine() + ": Redefined function: " + funName);
         } else {
+            FunctionType functionType = new FunctionType(new BasicTypeSymbol(typeName), null);
+            FunctionSymbol fun = new FunctionSymbol(currentScope, funName, functionType);
             currentScope.define(fun);
             fun.addPosition(new Position(ctx.IDENT().getSymbol().getLine(), ctx.IDENT().getSymbol().getCharPositionInLine()));
             // 切换作用域

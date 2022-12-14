@@ -18,7 +18,7 @@ public class FunctionSymbol extends BaseScope implements Symbol {
     }
     @Override
     public Type getType() {
-        return this.getType();
+        return type;
     }
 
     @Override

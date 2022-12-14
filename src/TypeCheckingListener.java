@@ -207,7 +207,7 @@ public class TypeCheckingListener extends SysYParserBaseListener {
 
     @Override
     public void exitReturnStat(SysYParser.ReturnStatContext ctx) {
-        FunctionSymbol fun = (FunctionSymbol) currentScope;
+        FunctionSymbol fun = (FunctionSymbol) currentScope.getEnclosingScope();
         Type retType = ((FunctionType)fun.getType()).getRetTy();
         if (!retType.getIsFunction() && !retType.getIsArray()) {
             if ("void".equals(((BasicTypeSymbol) retType).getName())) {

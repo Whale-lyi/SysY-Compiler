@@ -118,6 +118,7 @@ public class TypeCheckingListener extends SysYParserBaseListener {
     /**
      * (3) When to define symbols?
      */
+
     @Override
     public void exitConstDecl(SysYParser.ConstDeclContext ctx) {
         String typeName = ctx.bType().getText();
@@ -202,6 +203,7 @@ public class TypeCheckingListener extends SysYParserBaseListener {
     /**
      * (4) When to resolve symbols?
      */
+
 
     @Override
     public void exitAssignStat(SysYParser.AssignStatContext ctx) {

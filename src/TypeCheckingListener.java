@@ -119,6 +119,7 @@ public class TypeCheckingListener extends SysYParserBaseListener {
      * (3) When to define symbols?
      */
 
+
     @Override
     public void exitConstDecl(SysYParser.ConstDeclContext ctx) {
         String typeName = ctx.bType().getText();
@@ -200,21 +201,36 @@ public class TypeCheckingListener extends SysYParserBaseListener {
         }
     }
 
-    @Override
-    public void exitReturnStat(SysYParser.ReturnStatContext ctx) {
-        Type type = typeProperty.get(ctx.exp());
-        if (type != null) {
-            if (type.getIsArray() || type.getIsFunction()) {
-                hasError = true;
-                System.err.println("Error type 7 at Line " + ctx.RETURN().getSymbol().getLine() + ": type.Type mismatched for return.");
-            }
-        }
-    }
-
     /**
      * (4) When to resolve symbols?
      */
 
+    @Override
+    public void exitReturnStat(SysYParser.ReturnStatContext ctx) {
+        FunctionSymbol fun = (FunctionSymbol) currentScope;
+        Type retType = ((FunctionType)fun.getType()).getRetTy();
+        if (!retType.getIsFunction() && !retType.getIsArray()) {
+            if ("void".equals(((BasicTypeSymbol) retType).getName())) {
+                if (ctx.exp() != null) {
+                    hasError = true;
+                    System.err.println("Error type 7 at Line " + ctx.RETURN().getSymbol().getLine() + ": type.Type mismatched for return.");
+                }
+            } else if ("int".equals(((BasicTypeSymbol) retType).getName())) {
+                if (ctx.exp() == null) {
+                    hasError = true;
+                    System.err.println("Error type 7 at Line " + ctx.RETURN().getSymbol().getLine() + ": type.Type mismatched for return.");
+                } else {
+                    Type type = typeProperty.get(ctx.exp());
+                    if (type != null) {
+                        if (type.getIsArray() || type.getIsFunction()) {
+                            hasError = true;
+                            System.err.println("Error type 7 at Line " + ctx.RETURN().getSymbol().getLine() + ": type.Type mismatched for return.");
+                        }
+                    }
+                }
+            }
+        }
+    }
 
     @Override
     public void exitAssignStat(SysYParser.AssignStatContext ctx) {

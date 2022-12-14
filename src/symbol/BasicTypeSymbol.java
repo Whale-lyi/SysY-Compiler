@@ -12,4 +12,19 @@ public class BasicTypeSymbol extends BaseSymbol implements Type {
     public String toString() {
         return getName();
     }
+
+    @Override
+    public boolean getIsArray() {
+        return false;
+    }
+
+    @Override
+    public boolean getIsFunction() {
+        return false;
+    }
+
+    @Override
+    public int getLevel() {
+        return 0;
+    }
 }

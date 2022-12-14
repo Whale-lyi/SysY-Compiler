@@ -1,13 +1,16 @@
 import org.antlr.v4.runtime.tree.ParseTreeProperty;
-import org.antlr.v4.runtime.tree.TerminalNode;
-import scope.*;
-import scope.base.*;
-import symbol.*;
-import symbol.base.*;
-import type.*;
+import scope.GlobalScope;
+import scope.LocalScope;
+import scope.base.Scope;
+import symbol.BasicTypeSymbol;
+import symbol.FunctionSymbol;
+import symbol.VariableSymbol;
+import symbol.base.Position;
+import symbol.base.Symbol;
+import type.ArrayType;
+import type.FunctionType;
 import type.base.Type;
 
-import java.util.ArrayList;
 import java.util.List;
 
 public class TypeCheckingListener extends SysYParserBaseListener {
@@ -15,7 +18,7 @@ public class TypeCheckingListener extends SysYParserBaseListener {
     private GlobalScope globalScope = null;
     private Scope currentScope = null;
     private Position position;
-    private final ParseTreeProperty<Type> arrayTypeProperty = new ParseTreeProperty<>();
+    private final ParseTreeProperty<Type> typeProperty = new ParseTreeProperty<>();
     private final ParseTreeProperty<Integer> expValueProperty = new ParseTreeProperty<>();
     private Symbol symbol;
 
@@ -132,7 +135,7 @@ public class TypeCheckingListener extends SysYParserBaseListener {
                     // 数组
                     type = new BasicTypeSymbol(typeName);
                     for (int i = constExpContexts.size() - 1; i >= 0; i--) {
-                        type = new ArrayType(expValueProperty.get(constExpContexts.get(i).exp()), type);
+                        type = new ArrayType(expValueProperty.get(constExpContexts.get(i).exp()) + 1, type);
                     }
                 }
                 VariableSymbol varSymbol = new VariableSymbol(varName, type, true);
@@ -148,54 +151,105 @@ public class TypeCheckingListener extends SysYParserBaseListener {
      */
 
     /**
-     * (5) Construct the array type from bottom to top
+     * lVal
      */
-
+    @Override
+    public void exitLVal(SysYParser.LValContext ctx) {
+        Symbol resolve = currentScope.resolve(ctx.IDENT().getText());
+        if (resolve == null) {
+            hasError = true;
+            System.err.println("Error type 1 at Line " + ctx.IDENT().getSymbol().getLine() + ": Undefined variable: " + ctx.IDENT().getText());
+        } else {
+            if (!resolve.getType().getIsArray()) {
+                hasError = true;
+                System.err.println("Error type 9 at Line " + ctx.IDENT().getSymbol().getLine() + ": Not an array: " + ctx.IDENT().getText());
+            } else {
+                resolve.addPosition(new Position(ctx.IDENT().getSymbol().getLine(), ctx.IDENT().getSymbol().getCharPositionInLine()));
+                Type type = resolve.getType();
+                if (ctx.exp() != null && ctx.exp().size() > 0) {
+                    for (SysYParser.ExpContext exp : ctx.exp()) {
+                        //TODO: 比较是否越界
+                        type = ((ArrayType) type).getSubType();
+                    }
+                }
+                typeProperty.put(ctx, type);
+            }
+        }
+    }
 
     /**
      * exp 求值
      * @return
      */
     @Override
-    public void exitMulDivModExp(SysYParser.MulDivModExpContext ctx) {
+    public void exitFuncCallExp(SysYParser.FuncCallExpContext ctx) {
+        Symbol resolve = currentScope.resolve(ctx.IDENT().getText());
+        if (resolve == null) {
+            hasError = true;
+            System.err.println("Error type 2 at Line " + ctx.IDENT().getSymbol().getLine() + ": Undefined function: " + ctx.IDENT().getText());
+        } else {
+            if (!resolve.getType().getIsFunction()) {
+                hasError = true;
+                System.err.println("Error type 10 at Line " + ctx.IDENT().getSymbol().getLine() + ": Not a function: " + ctx.IDENT().getText());
+            } else {
+                resolve.addPosition(new Position(ctx.IDENT().getSymbol().getLine(), ctx.IDENT().getSymbol().getCharPositionInLine()));
+                typeProperty.put(ctx, ((FunctionType) resolve.getType()).getRetTy());
+                //TODO: 参数匹配
+            }
+        }
+    }
 
-        super.exitMulDivModExp(ctx);
+    @Override
+    public void exitMulDivModExp(SysYParser.MulDivModExpContext ctx) {
+        int lvalue = expValueProperty.get(ctx.lhs);
+        int rvalue = expValueProperty.get(ctx.rhs);
+        if (ctx.op.getType() == SysYParser.MUL) {
+            expValueProperty.put(ctx, lvalue * rvalue);
+        } else if (ctx.op.getType() == SysYParser.DIV) {
+            expValueProperty.put(ctx, lvalue / rvalue);
+        } else if (ctx.op.getType() == SysYParser.MOD) {
+            expValueProperty.put(ctx, lvalue % rvalue);
+        }
     }
 
     @Override
     public void exitLeftValExp(SysYParser.LeftValExpContext ctx) {
-        super.exitLeftValExp(ctx);
+        expValueProperty.put(ctx, expValueProperty.get(ctx.lVal()));
     }
 
     @Override
     public void exitIntegerExp(SysYParser.IntegerExpContext ctx) {
-        super.exitIntegerExp(ctx);
+        expValueProperty.put(ctx, Visitor.parseInt(ctx.number().INTEGR_CONST().getText()));
     }
 
     @Override
     public void exitParenExp(SysYParser.ParenExpContext ctx) {
-        super.exitParenExp(ctx);
+        expValueProperty.put(ctx, expValueProperty.get(ctx.exp()));
     }
 
     @Override
     public void exitUnaryOpExp(SysYParser.UnaryOpExpContext ctx) {
-        super.exitUnaryOpExp(ctx);
-    }
-
-    @Override
-    public void exitFuncCallExp(SysYParser.FuncCallExpContext ctx) {
-        super.exitFuncCallExp(ctx);
+        String op = ctx.unaryOp().getText();
+        if ("+".equals(op)) {
+            expValueProperty.put(ctx, expValueProperty.get(ctx.exp()));
+        } else if ("-".equals(op)) {
+            expValueProperty.put(ctx, -expValueProperty.get(ctx.exp()));
+        }
     }
 
     @Override
     public void exitAddSubExp(SysYParser.AddSubExpContext ctx) {
-        super.exitAddSubExp(ctx);
+        int lvalue = expValueProperty.get(ctx.lhs);
+        int rvalue = expValueProperty.get(ctx.rhs);
+        if (ctx.op.getType() == SysYParser.PLUS) {
+            expValueProperty.put(ctx, lvalue + rvalue);
+        } else if (ctx.op.getType() == SysYParser.MINUS) {
+            expValueProperty.put(ctx, lvalue - rvalue);
+        }
     }
-
 
     public Symbol getSymbol() {
         return symbol;
     }
-
 
 }

@@ -9,6 +9,8 @@ public class ArrayType extends BaseType {
     public ArrayType(int count, Type subType) {
         this.count = count;
         this.subType = subType;
+        isArray = true;
+        this.level = subType.getLevel() + 1;
     }
 
     public int getCount() {
@@ -18,4 +20,6 @@ public class ArrayType extends BaseType {
     public Type getSubType() {
         return subType;
     }
+
+
 }

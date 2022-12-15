@@ -236,7 +236,9 @@ public class TypeCheckingListener extends SysYParserBaseListener {
         if (!retType.getIsFunction() && !retType.getIsArray()) {
             if ("void".equals(((BasicTypeSymbol) retType).getName())) {
                 if (ctx.exp() != null) {
-                    reportError(7, ctx.RETURN().getSymbol().getLine(), ": type.Type mismatched for return.");
+                    if (typeProperty.get(ctx.exp()) != null) {
+                        reportError(7, ctx.RETURN().getSymbol().getLine(), ": type.Type mismatched for return.");
+                    }
                 }
             } else if ("int".equals(((BasicTypeSymbol) retType).getName())) {
                 if (ctx.exp() == null) {

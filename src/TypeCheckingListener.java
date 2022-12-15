@@ -232,7 +232,7 @@ public class TypeCheckingListener extends SysYParserBaseListener {
 
     @Override
     public void exitReturnStat(SysYParser.ReturnStatContext ctx) {
-        Scope fun = currentScope.getEnclosingScope();
+        Scope fun = currentScope;
         while (!(fun instanceof FunctionSymbol)) {
             fun = fun.getEnclosingScope();
         }

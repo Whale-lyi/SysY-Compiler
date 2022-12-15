@@ -451,9 +451,23 @@ public class TypeCheckingListener extends SysYParserBaseListener {
         }
     }
 
+    /**
+     * cond
+     */
+
     @Override
     public void exitOrCond(SysYParser.OrCondContext ctx) {
-
+        Type lvalue = typeProperty.get(ctx.lhs);
+        Type rvalue = typeProperty.get(ctx.rhs);
+        if (lvalue != null && rvalue != null) {
+            if (lvalue.getIsArray() || lvalue.getIsFunction()) {
+                reportError(6, lineProperty.get(ctx.lhs), ": type.Type mismatched for operands.");
+            } else if (rvalue.getIsArray() || rvalue.getIsFunction()) {
+                reportError(6, lineProperty.get(ctx.rhs), ": type.Type mismatched for operands.");
+            } else {
+                typeProperty.put(ctx, lvalue);
+            }
+        }
     }
 
     @Override
@@ -463,24 +477,48 @@ public class TypeCheckingListener extends SysYParserBaseListener {
 
     @Override
     public void exitAndCond(SysYParser.AndCondContext ctx) {
-
+        Type lvalue = typeProperty.get(ctx.lhs);
+        Type rvalue = typeProperty.get(ctx.rhs);
+        if (lvalue != null && rvalue != null) {
+            if (lvalue.getIsArray() || lvalue.getIsFunction()) {
+                reportError(6, lineProperty.get(ctx.lhs), ": type.Type mismatched for operands.");
+            } else if (rvalue.getIsArray() || rvalue.getIsFunction()) {
+                reportError(6, lineProperty.get(ctx.rhs), ": type.Type mismatched for operands.");
+            } else {
+                typeProperty.put(ctx, lvalue);
+            }
+        }
     }
 
     @Override
     public void exitLTGTLEGECond(SysYParser.LTGTLEGECondContext ctx) {
-
+        Type lvalue = typeProperty.get(ctx.lhs);
+        Type rvalue = typeProperty.get(ctx.rhs);
+        if (lvalue != null && rvalue != null) {
+            if (lvalue.getIsArray() || lvalue.getIsFunction()) {
+                reportError(6, lineProperty.get(ctx.lhs), ": type.Type mismatched for operands.");
+            } else if (rvalue.getIsArray() || rvalue.getIsFunction()) {
+                reportError(6, lineProperty.get(ctx.rhs), ": type.Type mismatched for operands.");
+            } else {
+                typeProperty.put(ctx, lvalue);
+            }
+        }
     }
 
     @Override
     public void exitEQNEQCond(SysYParser.EQNEQCondContext ctx) {
-
+        Type lvalue = typeProperty.get(ctx.lhs);
+        Type rvalue = typeProperty.get(ctx.rhs);
+        if (lvalue != null && rvalue != null) {
+            if (lvalue.getIsArray() || lvalue.getIsFunction()) {
+                reportError(6, lineProperty.get(ctx.lhs), ": type.Type mismatched for operands.");
+            } else if (rvalue.getIsArray() || rvalue.getIsFunction()) {
+                reportError(6, lineProperty.get(ctx.rhs), ": type.Type mismatched for operands.");
+            } else {
+                typeProperty.put(ctx, lvalue);
+            }
+        }
     }
-
-    /**
-     * cond
-     */
-
-
 
     public Symbol getSymbol() {
         return symbol;

@@ -96,7 +96,7 @@ exp
    ;
 
 cond
-   : exp                                                # ExpCond
+   : exp                                                            # ExpCond
    | lhs = cond (op = LT | op = GT | op = LE | op = GE) rhs = cond  # LTGTLEGECond
    | lhs = cond (op = EQ | op = NEQ) rhs = cond                     # EQNEQCond
    | lhs = cond AND rhs = cond                                      # AndCond

@@ -65,10 +65,12 @@ public class TypeCheckingListener extends SysYParserBaseListener {
 
     @Override
     public void enterBlock(SysYParser.BlockContext ctx) {
-        if (!(currentScope instanceof FunctionSymbol)) {
-            LocalScope localScope = new LocalScope(currentScope);
-            currentScope = localScope;
-        }
+//        if (!(currentScope instanceof FunctionSymbol)) {
+//            LocalScope localScope = new LocalScope(currentScope);
+//            currentScope = localScope;
+//        }
+        LocalScope localScope = new LocalScope(currentScope);
+        currentScope = localScope;
     }
 
     /**
@@ -102,15 +104,22 @@ public class TypeCheckingListener extends SysYParserBaseListener {
 
     @Override
     public void exitBlock(SysYParser.BlockContext ctx) {
-        if (!(currentScope instanceof FunctionSymbol)) {
-            for (Symbol sym : currentScope.getSymbols().values()) {
-                if (sym.checkPosition(position)) {
-                    symbol = sym;
-                    break;
-                }
+//        if (!(currentScope instanceof FunctionSymbol)) {
+//            for (Symbol sym : currentScope.getSymbols().values()) {
+//                if (sym.checkPosition(position)) {
+//                    symbol = sym;
+//                    break;
+//                }
+//            }
+//            currentScope = currentScope.getEnclosingScope();
+//        }
+        for (Symbol sym : currentScope.getSymbols().values()) {
+            if (sym.checkPosition(position)) {
+                symbol = sym;
+                break;
             }
-            currentScope = currentScope.getEnclosingScope();
         }
+        currentScope = currentScope.getEnclosingScope();
     }
 
     /**

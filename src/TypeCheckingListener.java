@@ -65,10 +65,8 @@ public class TypeCheckingListener extends SysYParserBaseListener {
 
     @Override
     public void enterBlock(SysYParser.BlockContext ctx) {
-        if (!(currentScope instanceof FunctionSymbol)) {
-            LocalScope localScope = new LocalScope(currentScope);
-            currentScope = localScope;
-        }
+        LocalScope localScope = new LocalScope(currentScope);
+        currentScope = localScope;
     }
 
     /**
@@ -107,9 +105,7 @@ public class TypeCheckingListener extends SysYParserBaseListener {
                 break;
             }
         }
-        if (!(currentScope instanceof FunctionSymbol)) {
-            currentScope = currentScope.getEnclosingScope();
-        }
+        currentScope = currentScope.getEnclosingScope();
     }
 
     /**

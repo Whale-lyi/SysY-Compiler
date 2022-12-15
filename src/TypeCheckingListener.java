@@ -347,8 +347,43 @@ public class TypeCheckingListener extends SysYParserBaseListener {
                 reportError(10, ctx.IDENT().getSymbol().getLine(), ": Not a function: " + ctx.IDENT().getText());
             } else {
                 resolve.addPosition(new Position(ctx.IDENT().getSymbol().getLine(), ctx.IDENT().getSymbol().getCharPositionInLine()));
+                // TODO: 本质错误?
                 typeProperty.put(ctx, ((FunctionType) resolve.getType()).getRetTy());
-                //TODO: 参数匹配
+                // 参数匹配
+                ArrayList<Type> paramsType = ((FunctionType) resolve.getType()).getParamsType();
+                if (ctx.funcRParams() == null) {
+                    if (paramsType != null && paramsType.size() > 0) {
+                        reportError(8, ctx.IDENT().getSymbol().getLine(), ": Function is not applicable for arguments.");
+                    }
+                } else {
+                    if (paramsType == null || paramsType.size() == 0) {
+                        reportError(8, ctx.IDENT().getSymbol().getLine(), ": Function is not applicable for arguments.");
+                    } else {
+                        List<SysYParser.ParamContext> param = ctx.funcRParams().param();
+                        if (param.size() != paramsType.size()) {
+                            reportError(8, ctx.IDENT().getSymbol().getLine(), ": Function is not applicable for arguments.");
+                        } else {
+                            int length = param.size();
+                            for (int i = 0; i < length - 1; i++) {
+                                Type type1 = typeProperty.get(param.get(i).exp());
+                                Type type2 = paramsType.get(i);
+                                if (type1 != null) {
+                                    if (type1.getIsArray()) {
+                                        if (!type2.getIsArray() || type2.getLevel() != type1.getLevel()) {
+                                            reportError(8, ctx.IDENT().getSymbol().getLine(), ": Function is not applicable for arguments.");
+                                        }
+                                    } else if (type1.getIsFunction()) {
+                                        reportError(8, ctx.IDENT().getSymbol().getLine(), ": Function is not applicable for arguments.");
+                                    } else {
+                                        if (type2.getIsFunction() || type2.getIsArray()) {
+                                            reportError(8, ctx.IDENT().getSymbol().getLine(), ": Function is not applicable for arguments.");
+                                        }
+                                    }
+                                }
+                            }
+                        }
+                    }
+                }
             }
         }
     }

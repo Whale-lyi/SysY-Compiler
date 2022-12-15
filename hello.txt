@@ -25,5 +25,5 @@ void test(){
 }
 
 int test1(int i, int i){
-    return test(i + 1);
+    return test1(i + 1);
 }

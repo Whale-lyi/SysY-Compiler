@@ -97,10 +97,10 @@ exp
 
 cond
    : exp                                                # ExpCond
-   | cond (op = LT | op = GT | op = LE | op = GE) cond  # LTGTLEGECond
-   | cond (op = EQ | op = NEQ) cond                     # EQNEQCond
-   | cond AND cond                                      # AndCond
-   | cond OR cond                                       # OrCond
+   | lhs = cond (op = LT | op = GT | op = LE | op = GE) rhs = cond  # LTGTLEGECond
+   | lhs = cond (op = EQ | op = NEQ) rhs = cond                     # EQNEQCond
+   | lhs = cond AND rhs = cond                                      # AndCond
+   | lhs = cond OR rhs = cond                                       # OrCond
    ;
 
 lVal

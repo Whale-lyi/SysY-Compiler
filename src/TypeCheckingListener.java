@@ -451,6 +451,37 @@ public class TypeCheckingListener extends SysYParserBaseListener {
         }
     }
 
+    @Override
+    public void exitOrCond(SysYParser.OrCondContext ctx) {
+
+    }
+
+    @Override
+    public void exitExpCond(SysYParser.ExpCondContext ctx) {
+        typeProperty.put(ctx, typeProperty.get(ctx.exp()));
+    }
+
+    @Override
+    public void exitAndCond(SysYParser.AndCondContext ctx) {
+
+    }
+
+    @Override
+    public void exitLTGTLEGECond(SysYParser.LTGTLEGECondContext ctx) {
+
+    }
+
+    @Override
+    public void exitEQNEQCond(SysYParser.EQNEQCondContext ctx) {
+
+    }
+
+    /**
+     * cond
+     */
+
+
+
     public Symbol getSymbol() {
         return symbol;
     }

@@ -13,22 +13,22 @@ public class Main {
             System.err.println("There should be 4 arguments");
         }
         String source = args[0];
-//        String source = "tests/test1.sysy";
-        CharStream input = CharStreams.fromFileName(source);
+        String source = "tests/test1.sysy";
+//        CharStream input = CharStreams.fromFileName(source);
         SysYLexer sysYLexer = new SysYLexer(input);
         CommonTokenStream tokens = new CommonTokenStream(sysYLexer);
         SysYParser sysYParser = new SysYParser(tokens);
         ParseTree tree = sysYParser.program();
 
         ParseTreeWalker parseTreeWalker = new ParseTreeWalker();
-        TypeCheckingListener typeCheckingListener = new TypeCheckingListener(new Position(Integer.parseInt(args[1]), Integer.parseInt(args[2])));
-//        TypeCheckingListener typeCheckingListener = new TypeCheckingListener(new Position(5, 13));
+//        TypeCheckingListener typeCheckingListener = new TypeCheckingListener(new Position(Integer.parseInt(args[1]), Integer.parseInt(args[2])));
+        TypeCheckingListener typeCheckingListener = new TypeCheckingListener(new Position(5, 13));
         parseTreeWalker.walk(typeCheckingListener, tree);
 
 
         if (!typeCheckingListener.hasError) {
-            Visitor visitor = new Visitor(sysYParser.getRuleNames(), sysYLexer.getRuleNames(), typeCheckingListener.getSymbol(), args[3]);
-//            Visitor visitor = new Visitor(sysYParser.getRuleNames(), sysYLexer.getRuleNames(), typeCheckingListener.getSymbol(), "d");
+//            Visitor visitor = new Visitor(sysYParser.getRuleNames(), sysYLexer.getRuleNames(), typeCheckingListener.getSymbol(), args[3]);
+            Visitor visitor = new Visitor(sysYParser.getRuleNames(), sysYLexer.getRuleNames(), typeCheckingListener.getSymbol(), "d");
             visitor.visit(tree);
         }
     }

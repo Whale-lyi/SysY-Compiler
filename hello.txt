@@ -25,5 +25,6 @@ int test(){
 }
 
 int test1(int i, int i){
+    b;
     return test(i + 1);
 }

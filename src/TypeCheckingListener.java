@@ -164,6 +164,13 @@ public class TypeCheckingListener extends SysYParserBaseListener {
                 if (constExpContexts == null || constExpContexts.size() == 0) {
                     // 变量
                     type = new BasicTypeSymbol(typeName);
+                    if (constDefContext.constInitVal() instanceof SysYParser.ExpConstInitValContext) {
+                        if (type.getLevel() != typeProperty.get(((SysYParser.ExpConstInitValContext) constDefContext.constInitVal()).constExp()).getLevel()) {
+                            reportError(5, constDefContext.IDENT().getSymbol().getLine(), ": type.Type mismatched for assignment.");
+                        }
+                    } else {
+                        reportError(5, constDefContext.IDENT().getSymbol().getLine(), ": type.Type mismatched for assignment.");
+                    }
                 } else {
                     // 数组
                     type = new BasicTypeSymbol(typeName);
@@ -457,6 +464,11 @@ public class TypeCheckingListener extends SysYParserBaseListener {
                 lineProperty.put(ctx, lineProperty.get(ctx.rhs));
             }
         }
+    }
+
+    @Override
+    public void exitConstExp(SysYParser.ConstExpContext ctx) {
+        typeProperty.put(ctx, typeProperty.get(ctx.exp()));
     }
 
     /**

@@ -165,8 +165,11 @@ public class TypeCheckingListener extends SysYParserBaseListener {
                     // 变量
                     type = new BasicTypeSymbol(typeName);
                     if (constDefContext.constInitVal() instanceof SysYParser.ExpConstInitValContext) {
-                        if (type.getLevel() != typeProperty.get(((SysYParser.ExpConstInitValContext) constDefContext.constInitVal()).constExp()).getLevel()) {
-                            reportError(5, constDefContext.IDENT().getSymbol().getLine(), ": type.Type mismatched for assignment.");
+                        Type tmp = typeProperty.get(((SysYParser.ExpConstInitValContext) constDefContext.constInitVal()).constExp());
+                        if (tmp != null) {
+                            if (type.getLevel() != tmp.getLevel()) {
+                                reportError(5, constDefContext.IDENT().getSymbol().getLine(), ": type.Type mismatched for assignment.");
+                            }
                         }
                     } else {
                         reportError(5, constDefContext.IDENT().getSymbol().getLine(), ": type.Type mismatched for assignment.");
@@ -199,8 +202,11 @@ public class TypeCheckingListener extends SysYParserBaseListener {
             if (constExpContexts == null || constExpContexts.size() == 0) {
                 // 变量
                 if (ctx.initVal() instanceof SysYParser.ExpInitValContext) {
-                    if (type.getLevel() != typeProperty.get(((SysYParser.ExpInitValContext) ctx.initVal()).exp()).getLevel()) {
-                        reportError(5, ctx.IDENT().getSymbol().getLine(), ": type.Type mismatched for assignment.");
+                    Type tmp = typeProperty.get(((SysYParser.ExpInitValContext) ctx.initVal()).exp());
+                    if (tmp != null) {
+                        if (type.getLevel() != tmp.getLevel()) {
+                            reportError(5, ctx.IDENT().getSymbol().getLine(), ": type.Type mismatched for assignment.");
+                        }
                     }
                 } else {
                     reportError(5, ctx.IDENT().getSymbol().getLine(), ": type.Type mismatched for assignment.");

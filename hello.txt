@@ -24,6 +24,6 @@ int test(){
     return b();
 }
 
-int test(int i, int i){
+int test1(int i, int i){
     return test(i + 1);
 }

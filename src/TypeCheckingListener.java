@@ -195,9 +195,17 @@ public class TypeCheckingListener extends SysYParserBaseListener {
             reportError(3, ctx.IDENT().getSymbol().getLine(), ": Redefined variable: " + varName);
         } else {
             List<SysYParser.ConstExpContext> constExpContexts = ctx.constExp();
-            // 变量
             Type type = new BasicTypeSymbol(typeName);
-            if (constExpContexts != null && constExpContexts.size() > 0) {
+            if (constExpContexts == null || constExpContexts.size() == 0) {
+                // 变量
+                if (ctx.initVal() instanceof SysYParser.ExpInitValContext) {
+                    if (type.getLevel() != typeProperty.get(((SysYParser.ExpInitValContext) ctx.initVal()).exp()).getLevel()) {
+                        reportError(5, ctx.IDENT().getSymbol().getLine(), ": type.Type mismatched for assignment.");
+                    }
+                } else {
+                    reportError(5, ctx.IDENT().getSymbol().getLine(), ": type.Type mismatched for assignment.");
+                }
+            } else {
                 // 数组
                 for (int i = constExpContexts.size() - 1; i >= 0; i--) {
                     type = new ArrayType(expValueProperty.get(constExpContexts.get(i).exp()) + 1, type);

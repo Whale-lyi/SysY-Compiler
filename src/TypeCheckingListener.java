@@ -12,6 +12,7 @@ import type.ArrayType;
 import type.FunctionType;
 import type.base.Type;
 
+import java.util.ArrayList;
 import java.util.List;
 
 public class TypeCheckingListener extends SysYParserBaseListener {
@@ -44,19 +45,6 @@ public class TypeCheckingListener extends SysYParserBaseListener {
         globalScope.resolve(typeName);
         // 声明函数符号
         String funName = ctx.IDENT().getText();
-        // TODO：写到参数声明
-//        ArrayList<Type> paramsType = new ArrayList<>();
-//        if (ctx.funcFParams() != null) {
-//            // 函数符号添加参数类型
-//            for (SysYParser.FuncFParamContext paramContext : ctx.funcFParams().funcFParam()) {
-//                List<TerminalNode> lBrackt = paramContext.L_BRACKT();
-//                if (lBrackt == null || lBrackt.size() == 0) {
-//                    paramsType.add(new BasicTypeSymbol(paramContext.bType().getText()));
-//                } else if (lBrackt.size() == 1){
-//                    paramsType.add(new ArrayType(-1, new BasicTypeSymbol(paramContext.bType().getText())));
-//                }
-//            }
-//        }
         // 检查是否重复定义
         Symbol resolve = currentScope.resolve(funName);
         if (resolve != null) {
@@ -124,6 +112,37 @@ public class TypeCheckingListener extends SysYParserBaseListener {
      * (3) When to define symbols?
      */
 
+    @Override
+    public void exitFuncFParams(SysYParser.FuncFParamsContext ctx) {
+        ArrayList<Type> paramsType = new ArrayList<>();
+        for (SysYParser.FuncFParamContext paramContext : ctx.funcFParam()) {
+            String varName = paramContext.IDENT().getText();
+            String typeName = paramContext.bType().getText();
+            Symbol resolve = currentScope.resolveInCurScope(varName);
+            if (resolve != null) {
+                reportError(3, paramContext.IDENT().getSymbol().getLine(), ": Redefined variable: " + varName);
+            } else {
+                List<TerminalNode> lBrackt = paramContext.L_BRACKT();
+                Type type;
+                if (lBrackt == null || lBrackt.size() == 0) {
+                    type = new BasicTypeSymbol(typeName);
+                } else if (lBrackt.size() == 1){
+                    type = new ArrayType(-1, new BasicTypeSymbol(typeName));
+                } else {
+                    type = new BasicTypeSymbol(typeName);
+                    for (int i = lBrackt.size() - 1; i >= 1; i--) {
+                        type = new ArrayType(expValueProperty.get(paramContext.exp().get(i)) + 1, type);
+                    }
+                    type = new ArrayType(-1, type);
+                }
+                paramsType.add(type);
+                VariableSymbol varSymbol = new VariableSymbol(varName, type, false);
+                currentScope.define(varSymbol);
+                varSymbol.addPosition(new Position(paramContext.IDENT().getSymbol().getLine(), paramContext.IDENT().getSymbol().getCharPositionInLine()));
+            }
+        }
+        ((FunctionType)((FunctionSymbol) currentScope).getType()).setParamsType(paramsType);
+    }
 
     @Override
     public void exitConstDecl(SysYParser.ConstDeclContext ctx) {

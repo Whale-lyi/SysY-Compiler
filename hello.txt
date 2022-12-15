@@ -2,7 +2,7 @@ int a() {
     return 10;
 }
 
-int main() {
+int main(int a) {
     int a = 3;
     int b = 4;
     a = 5;

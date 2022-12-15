@@ -22,7 +22,7 @@ public class Main {
 
         ParseTreeWalker parseTreeWalker = new ParseTreeWalker();
 //        TypeCheckingListener typeCheckingListener = new TypeCheckingListener(new Position(Integer.parseInt(args[1]), Integer.parseInt(args[2])));
-        TypeCheckingListener typeCheckingListener = new TypeCheckingListener(new Position(5, 14));
+        TypeCheckingListener typeCheckingListener = new TypeCheckingListener(new Position(5, 13));
         parseTreeWalker.walk(typeCheckingListener, tree);
 
 

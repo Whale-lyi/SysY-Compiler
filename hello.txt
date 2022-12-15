@@ -1,3 +1,11 @@
+void test(){
+    return b();
+}
+
+int test1(int i, int i){
+    return test(i + 1);
+}
+
 int a(){
     return 1;
 }
@@ -18,12 +26,4 @@ int main(){
     test1();
     a = 1;
     return a;
-}
-
-void test(){
-    return b();
-}
-
-int test1(int i, int i){
-    return test(i + 1);
 }

@@ -349,6 +349,7 @@ public class TypeCheckingListener extends SysYParserBaseListener {
                 resolve.addPosition(new Position(ctx.IDENT().getSymbol().getLine(), ctx.IDENT().getSymbol().getCharPositionInLine()));
                 // TODO: 本质错误?
                 typeProperty.put(ctx, ((FunctionType) resolve.getType()).getRetTy());
+                lineProperty.put(ctx, ctx.IDENT().getSymbol().getLine());
                 // 参数匹配
                 ArrayList<Type> paramsType = ((FunctionType) resolve.getType()).getParamsType();
                 if (ctx.funcRParams() == null) {
@@ -400,6 +401,7 @@ public class TypeCheckingListener extends SysYParserBaseListener {
                 reportError(6, lineProperty.get(ctx.rhs), ": type.Type mismatched for operands.");
             } else {
                 typeProperty.put(ctx, lvalue);
+                lineProperty.put(ctx, lineProperty.get(ctx.rhs));
             }
         }
     }
@@ -432,6 +434,7 @@ public class TypeCheckingListener extends SysYParserBaseListener {
                 reportError(6, lineProperty.get(ctx.exp()), ": type.Type mismatched for operands.");
             } else {
                 typeProperty.put(ctx, type);
+                lineProperty.put(ctx, lineProperty.get(ctx.exp()));
             }
         }
     }
@@ -447,6 +450,7 @@ public class TypeCheckingListener extends SysYParserBaseListener {
                 reportError(6, lineProperty.get(ctx.rhs), ": type.Type mismatched for operands.");
             } else {
                 typeProperty.put(ctx, lvalue);
+                lineProperty.put(ctx, lineProperty.get(ctx.rhs));
             }
         }
     }
@@ -473,6 +477,7 @@ public class TypeCheckingListener extends SysYParserBaseListener {
     @Override
     public void exitExpCond(SysYParser.ExpCondContext ctx) {
         typeProperty.put(ctx, typeProperty.get(ctx.exp()));
+        lineProperty.put(ctx, lineProperty.get(ctx.exp()));
     }
 
     @Override

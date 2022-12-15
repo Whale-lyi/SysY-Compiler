@@ -87,16 +87,17 @@ public class TypeCheckingListener extends SysYParserBaseListener {
 
     @Override
     public void exitFuncDef(SysYParser.FuncDefContext ctx) {
-        for (Symbol sym : currentScope.getSymbols().values()) {
-            if (sym.checkPosition(position)) {
-                symbol = sym;
-                break;
+        if (valid) {
+            for (Symbol sym : currentScope.getSymbols().values()) {
+                if (sym.checkPosition(position)) {
+                    symbol = sym;
+                    break;
+                }
             }
-        }
-        currentScope = currentScope.getEnclosingScope();
-        if (!valid) {
+        } else {
             valid = true;
         }
+        currentScope = currentScope.getEnclosingScope();
     }
 
     @Override
@@ -262,6 +263,7 @@ public class TypeCheckingListener extends SysYParserBaseListener {
             if ("void".equals(((BasicTypeSymbol) retType).getName())) {
                 if (ctx.exp() != null) {
                     if (typeProperty.get(ctx.exp()) != null) {
+                        // TODO: return void_f();
                         reportError(7, ctx.RETURN().getSymbol().getLine(), ": type.Type mismatched for return.");
                     }
                 }
@@ -342,6 +344,7 @@ public class TypeCheckingListener extends SysYParserBaseListener {
                         } else {
                             temp = false;
                             reportError(9, ctx.IDENT().getSymbol().getLine(), ": Not an array: " + ctx.IDENT().getText());
+                            break;
                         }
                     }
                 }

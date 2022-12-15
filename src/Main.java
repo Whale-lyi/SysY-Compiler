@@ -12,9 +12,9 @@ public class Main {
         if (args.length != 4) {
             System.err.println("There should be 4 arguments");
         }
-        String source = args[0];
+//        String source = args[0];
         String source = "tests/test1.sysy";
-//        CharStream input = CharStreams.fromFileName(source);
+        CharStream input = CharStreams.fromFileName(source);
         SysYLexer sysYLexer = new SysYLexer(input);
         CommonTokenStream tokens = new CommonTokenStream(sysYLexer);
         SysYParser sysYParser = new SysYParser(tokens);

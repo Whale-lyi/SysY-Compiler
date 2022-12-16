@@ -13,7 +13,6 @@ public class Main {
             System.err.println("There should be 4 arguments");
         }
         String source = args[0];
-//        String source = "tests/test1.sysy";
         CharStream input = CharStreams.fromFileName(source);
         SysYLexer sysYLexer = new SysYLexer(input);
         CommonTokenStream tokens = new CommonTokenStream(sysYLexer);
@@ -22,7 +21,6 @@ public class Main {
 
         ParseTreeWalker parseTreeWalker = new ParseTreeWalker();
         TypeCheckingListener typeCheckingListener = new TypeCheckingListener(new Position(Integer.parseInt(args[1]), Integer.parseInt(args[2])));
-//        TypeCheckingListener typeCheckingListener = new TypeCheckingListener(new Position(0, 0));
         parseTreeWalker.walk(typeCheckingListener, tree);
 
 

@@ -12,8 +12,7 @@ public class Main {
         if (args.length != 4) {
             System.err.println("There should be 4 arguments");
         }
-//        String source = args[0];
-        String source = "tests/test1.sysy";
+        String source = args[0];
         CharStream input = CharStreams.fromFileName(source);
         SysYLexer sysYLexer = new SysYLexer(input);
         CommonTokenStream tokens = new CommonTokenStream(sysYLexer);
@@ -21,8 +20,7 @@ public class Main {
         ParseTree tree = sysYParser.program();
 
         ParseTreeWalker parseTreeWalker = new ParseTreeWalker();
-//        TypeCheckingListener typeCheckingListener = new TypeCheckingListener(new Position(Integer.parseInt(args[1]), Integer.parseInt(args[2])));
-        TypeCheckingListener typeCheckingListener = new TypeCheckingListener(new Position(0, 0));
+        TypeCheckingListener typeCheckingListener = new TypeCheckingListener(new Position(Integer.parseInt(args[1]), Integer.parseInt(args[2])));
         parseTreeWalker.walk(typeCheckingListener, tree);
 
 

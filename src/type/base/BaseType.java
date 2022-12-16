@@ -19,4 +19,9 @@ public class BaseType implements Type{
     public int getLevel() {
         return level;
     }
+
+    @Override
+    public boolean equals(Type type) {
+        return false;
+    }
 }

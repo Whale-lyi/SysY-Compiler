@@ -388,6 +388,9 @@ public class TypeCheckingListener extends SysYParserBaseListener {
                 lineProperty.put(ctx, ctx.IDENT().getSymbol().getLine());
                 // 参数匹配
                 ArrayList<Type> paramsType = ((FunctionType) resolve.getType()).getParamsType();
+                if (paramsType == null) {
+                    paramsType = new ArrayList<>();
+                }
                 ArrayList<Type> realParams = new ArrayList<>();
                 if (ctx.funcRParams() != null) {
                     for (SysYParser.ParamContext paramCtx : ctx.funcRParams().param()) {

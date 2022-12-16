@@ -372,7 +372,7 @@ public class TypeCheckingListener extends SysYParserBaseListener {
      */
     @Override
     public void exitFuncCallExp(SysYParser.FuncCallExpContext ctx) {
-        Symbol resolve = globalScope.resolve(ctx.IDENT().getText());
+        Symbol resolve = currentScope.resolve(ctx.IDENT().getText());
         if (resolve == null) {
             reportError(2, ctx.IDENT().getSymbol().getLine(), ": Undefined function: " + ctx.IDENT().getText());
         } else {

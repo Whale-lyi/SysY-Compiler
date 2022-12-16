@@ -384,7 +384,6 @@ public class TypeCheckingListener extends SysYParserBaseListener {
                 reportError(10, ctx.IDENT().getSymbol().getLine(), ": Not a function: " + ctx.IDENT().getText());
             } else {
                 resolve.addPosition(new Position(ctx.IDENT().getSymbol().getLine(), ctx.IDENT().getSymbol().getCharPositionInLine()));
-                // TODO: 本质错误?
                 typeProperty.put(ctx, ((FunctionType) resolve.getType()).getRetTy());
                 lineProperty.put(ctx, ctx.IDENT().getSymbol().getLine());
                 // 参数匹配
@@ -402,7 +401,7 @@ public class TypeCheckingListener extends SysYParserBaseListener {
                             reportError(8, ctx.IDENT().getSymbol().getLine(), ": Function is not applicable for arguments.");
                         } else {
                             int length = param.size();
-                            for (int i = 0; i < length - 1; i++) {
+                            for (int i = 0; i < length; i++) {
                                 Type type1 = typeProperty.get(param.get(i).exp());
                                 Type type2 = paramsType.get(i);
                                 if (type1 != null) {

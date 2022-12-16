@@ -21,5 +21,8 @@ public class ArrayType extends BaseType {
         return subType;
     }
 
-
+    @Override
+    public boolean equals(Type type) {
+        return (type instanceof ArrayType) && (this.getLevel() == type.getLevel());
+    }
 }

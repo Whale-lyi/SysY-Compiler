@@ -388,39 +388,61 @@ public class TypeCheckingListener extends SysYParserBaseListener {
                 lineProperty.put(ctx, ctx.IDENT().getSymbol().getLine());
                 // 参数匹配
                 ArrayList<Type> paramsType = ((FunctionType) resolve.getType()).getParamsType();
-                if (ctx.funcRParams() == null) {
-                    if (paramsType != null && paramsType.size() > 0) {
-                        reportError(8, ctx.IDENT().getSymbol().getLine(), ": Function is not applicable for arguments.");
+                ArrayList<Type> realParams = new ArrayList<>();
+                if (ctx.funcRParams() != null) {
+                    for (SysYParser.ParamContext paramCtx : ctx.funcRParams().param()) {
+                        realParams.add(typeProperty.get(paramCtx.exp()));
                     }
+                }
+                if (realParams.size() != paramsType.size()) {
+                    reportError(8, ctx.IDENT().getSymbol().getLine(), ": Function is not applicable for arguments.");
                 } else {
-                    if (paramsType == null || paramsType.size() == 0) {
-                        reportError(8, ctx.IDENT().getSymbol().getLine(), ": Function is not applicable for arguments.");
-                    } else {
-                        List<SysYParser.ParamContext> param = ctx.funcRParams().param();
-                        if (param.size() != paramsType.size()) {
-                            reportError(8, ctx.IDENT().getSymbol().getLine(), ": Function is not applicable for arguments.");
-                        } else {
-                            int length = param.size();
-                            for (int i = 0; i < length; i++) {
-                                Type type1 = typeProperty.get(param.get(i).exp());
-                                Type type2 = paramsType.get(i);
-                                if (type1 != null) {
-                                    if (type1.getIsArray()) {
-                                        if (!type2.getIsArray() || type2.getLevel() != type1.getLevel()) {
-                                            reportError(8, ctx.IDENT().getSymbol().getLine(), ": Function is not applicable for arguments.");
-                                        }
-                                    } else if (type1.getIsFunction()) {
-                                        reportError(8, ctx.IDENT().getSymbol().getLine(), ": Function is not applicable for arguments.");
-                                    } else {
-                                        if (type2.getIsFunction() || type2.getIsArray()) {
-                                            reportError(8, ctx.IDENT().getSymbol().getLine(), ": Function is not applicable for arguments.");
-                                        }
-                                    }
-                                }
+                    int length = realParams.size();
+                    for (int i = 0; i < length; i++) {
+                        Type type1 = realParams.get(i); // 调用
+                        Type type2 = paramsType.get(i); // 定义
+                        if (type1 != null) {
+                            if (!type1.equals(type2)) {
+                                reportError(8, ctx.IDENT().getSymbol().getLine(), ": Function is not applicable for arguments.");
+                                break;
                             }
                         }
                     }
                 }
+//
+//                if (ctx.funcRParams() == null) {
+//                    if (paramsType != null && paramsType.size() > 0) {
+//                        reportError(8, ctx.IDENT().getSymbol().getLine(), ": Function is not applicable for arguments.");
+//                    }
+//                } else {
+//                    if (paramsType == null || paramsType.size() == 0) {
+//                        reportError(8, ctx.IDENT().getSymbol().getLine(), ": Function is not applicable for arguments.");
+//                    } else {
+//                        List<SysYParser.ParamContext> param = ctx.funcRParams().param();
+//                        if (param.size() != paramsType.size()) {
+//                            reportError(8, ctx.IDENT().getSymbol().getLine(), ": Function is not applicable for arguments.");
+//                        } else {
+//                            int length = param.size();
+//                            for (int i = 0; i < length; i++) {
+//                                Type type1 = typeProperty.get(param.get(i).exp());
+//                                Type type2 = paramsType.get(i);
+//                                if (type1 != null) {
+//                                    if (type1.getIsArray()) {
+//                                        if (!type2.getIsArray() || type2.getLevel() != type1.getLevel()) {
+//                                            reportError(8, ctx.IDENT().getSymbol().getLine(), ": Function is not applicable for arguments.");
+//                                        }
+//                                    } else if (type1.getIsFunction()) {
+//                                        reportError(8, ctx.IDENT().getSymbol().getLine(), ": Function is not applicable for arguments.");
+//                                    } else {
+//                                        if (type2.getIsFunction() || type2.getIsArray()) {
+//                                            reportError(8, ctx.IDENT().getSymbol().getLine(), ": Function is not applicable for arguments.");
+//                                        }
+//                                    }
+//                                }
+//                            }
+//                        }
+//                    }
+//                }
             }
         }
     }

@@ -27,4 +27,9 @@ public class BasicTypeSymbol extends BaseSymbol implements Type {
     public int getLevel() {
         return 0;
     }
+
+    @Override
+    public boolean equals(Type type) {
+        return (type instanceof BasicTypeSymbol) && (this.getName().equals(((BasicTypeSymbol) type).getName()));
+    }
 }

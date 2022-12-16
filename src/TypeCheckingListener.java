@@ -153,7 +153,7 @@ public class TypeCheckingListener extends SysYParserBaseListener {
             String varName = constDefContext.IDENT().getText();
             // 检查重复定义
             Symbol resolve = currentScope.resolveInCurScope(varName);
-            if (currentScope.getEnclosingScope() instanceof FunctionSymbol) {
+            if (currentScope.getEnclosingScope() instanceof FunctionSymbol && resolve == null) {
                 resolve = currentScope.getEnclosingScope().resolveInCurScope(varName);
             }
             if (resolve != null) {
@@ -194,7 +194,7 @@ public class TypeCheckingListener extends SysYParserBaseListener {
         String varName = ctx.IDENT().getText();
         // 检查重复定义
         Symbol resolve = currentScope.resolveInCurScope(varName);
-        if (currentScope.getEnclosingScope() instanceof FunctionSymbol) {
+        if (currentScope.getEnclosingScope() instanceof FunctionSymbol && resolve == null) {
             resolve = currentScope.getEnclosingScope().resolveInCurScope(varName);
         }
         if (resolve != null) {
@@ -232,7 +232,7 @@ public class TypeCheckingListener extends SysYParserBaseListener {
         String varName = ctx.IDENT().getText();
         // 检查重复定义
         Symbol resolve = currentScope.resolveInCurScope(varName);
-        if (currentScope.getEnclosingScope() instanceof FunctionSymbol) {
+        if (currentScope.getEnclosingScope() instanceof FunctionSymbol && resolve == null) {
             resolve = currentScope.getEnclosingScope().resolveInCurScope(varName);
         }
         if (resolve != null) {

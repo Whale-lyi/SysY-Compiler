@@ -232,9 +232,9 @@ public class TypeCheckingListener extends SysYParserBaseListener {
         String varName = ctx.IDENT().getText();
         // 检查重复定义
         Symbol resolve = currentScope.resolveInCurScope(varName);
-//        if (currentScope.getEnclosingScope() instanceof FunctionSymbol) {
-//            resolve = currentScope.getEnclosingScope().resolveInCurScope(varName);
-//        }
+        if (currentScope.getEnclosingScope() instanceof FunctionSymbol) {
+            resolve = currentScope.getEnclosingScope().resolveInCurScope(varName);
+        }
         if (resolve != null) {
             reportError(3, ctx.IDENT().getSymbol().getLine(), ": Redefined variable: " + varName);
         } else {

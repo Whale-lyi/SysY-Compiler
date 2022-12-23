@@ -2,8 +2,6 @@ import org.antlr.v4.runtime.CharStream;
 import org.antlr.v4.runtime.CharStreams;
 import org.antlr.v4.runtime.CommonTokenStream;
 import org.antlr.v4.runtime.tree.ParseTree;
-import org.antlr.v4.runtime.tree.ParseTreeWalker;
-import symbol.base.Position;
 
 import java.io.IOException;
 
@@ -12,22 +10,18 @@ public class Main {
         if (args.length != 2) {
             System.err.println("There should be 2 arguments");
         }
-//        String source = args[0];
-//        CharStream input = CharStreams.fromFileName(source);
-//        SysYLexer sysYLexer = new SysYLexer(input);
-//        CommonTokenStream tokens = new CommonTokenStream(sysYLexer);
-//        SysYParser sysYParser = new SysYParser(tokens);
-//        ParseTree tree = sysYParser.program();
-//
-//        ParseTreeWalker parseTreeWalker = new ParseTreeWalker();
-//        TypeCheckingListener typeCheckingListener = new TypeCheckingListener(new Position(Integer.parseInt(args[1]), Integer.parseInt(args[2])));
-//        parseTreeWalker.walk(typeCheckingListener, tree);
-//
-//
-//        if (!typeCheckingListener.hasError) {
-//            Visitor visitor = new Visitor(sysYParser.getRuleNames(), sysYLexer.getRuleNames(), typeCheckingListener.getSymbol(), args[3]);
-//            visitor.visit(tree);
-//        }
+        String source = args[0];
+        String destination = args[1];
+//        String source = "tests/test1.sysy";
+//        String destination = "tests/test2.ll";
+        CharStream input = CharStreams.fromFileName(source);
+        SysYLexer sysYLexer = new SysYLexer(input);
+        CommonTokenStream tokens = new CommonTokenStream(sysYLexer);
+        SysYParser sysYParser = new SysYParser(tokens);
+        ParseTree tree = sysYParser.program();
+
+        MyIRVisitor irVisitor = new MyIRVisitor(destination);
+        irVisitor.visit(tree);
     }
 
 }

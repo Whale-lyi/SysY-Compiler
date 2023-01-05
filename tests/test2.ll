@@ -11,6 +11,9 @@ fEntry:
 
 define i32 @main() {
 mainEntry:
-  %0 = call i32 @f(i32 1)
+  %pointer_a = alloca i32, align 4
+  store i32 1, i32* %pointer_a, align 4
+  %a = load i32, i32* %pointer_a, align 4
+  %0 = call i32 @f(i32 %a)
   ret i32 %0
 }

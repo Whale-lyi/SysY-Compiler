@@ -98,6 +98,46 @@ public class MyIRVisitor extends SysYParserBaseVisitor<LLVMValueRef> {
     }
 
     @Override
+    public LLVMValueRef visitConstDecl(SysYParser.ConstDeclContext ctx) {
+        return super.visitConstDecl(ctx);
+    }
+
+    @Override
+    public LLVMValueRef visitVarDecl(SysYParser.VarDeclContext ctx) {
+        for (SysYParser.VarDefContext varDefContext : ctx.varDef()) {
+            String varName = varDefContext.IDENT().getText();
+            LLVMValueRef varPointer = LLVMBuildAlloca(builder, i32Type, "pointer_" + varName);
+
+            if (varDefContext.ASSIGN() != null) {
+                SysYParser.InitValContext initValContext = varDefContext.initVal();
+                if (initValContext instanceof SysYParser.ExpInitValContext) {
+                    // 整型
+                    SysYParser.ExpInitValContext expInitValContext = (SysYParser.ExpInitValContext) initValContext;
+                    LLVMValueRef initVal = visit(expInitValContext.exp());
+                    LLVMBuildStore(builder, initVal, varPointer);
+                } else {
+                    // 数组
+                    SysYParser.ArrayInitValContext arrayInitValContext = (SysYParser.ArrayInitValContext) initValContext;
+                    int initValCount = arrayInitValContext.initVal().size();
+                    int elementCount = (int) LLVMConstIntGetSExtValue(visit(varDefContext.constExp(0).exp()));
+                    LLVMValueRef[] initArray = new LLVMValueRef[elementCount];
+                    for (int i = 0; i < elementCount; i++) {
+                        if (i < initValCount) {
+                            initArray[i] = visit(arrayInitValContext.initVal(i));
+                        } else {
+                            initArray[i] = zero;
+                        }
+                    }
+                    buildGEP(elementCount, varPointer, initArray);
+                }
+            }
+
+            currentScope.define(varName, varPointer);
+        }
+        return null;
+    }
+
+    @Override
     public LLVMValueRef visitReturnStat(SysYParser.ReturnStatContext ctx) {
         hasReturn = true;
         if (ctx.exp() != null) {

@@ -13,8 +13,8 @@ compUnit
    ;
 
 decl
-   : constDecl  # ConstDeclStat
-   | varDecl    # VarDeclStat
+   : constDecl
+   | varDecl
    ;
 
 constDecl

@@ -17,6 +17,7 @@ public class MyIRVisitor extends SysYParserBaseVisitor<LLVMValueRef> {
     private final LLVMValueRef zero = LLVMConstInt(i32Type, 0, 0);
     public static final BytePointer error = new BytePointer();
     private String destFile;
+    private boolean hasReturn = false;
     public MyIRVisitor(String destFile) {
         //初始化LLVM
         LLVMInitializeCore(LLVMGetGlobalPassRegistry());
@@ -62,6 +63,7 @@ public class MyIRVisitor extends SysYParserBaseVisitor<LLVMValueRef> {
         LLVMTypeRef funcType = LLVMFunctionType(returnType, argumentTypes, paramsCount, 0);
         //生成函数，即向之前创建的module中添加函数
         LLVMValueRef function = LLVMAddFunction(module, funcName, funcType);
+        currentScope.define(funcName, function);
         // 创建基本块
         LLVMBasicBlockRef block = LLVMAppendBasicBlock(function, funcName + "Entry");
         // 在当前基本块插入指令
@@ -78,9 +80,11 @@ public class MyIRVisitor extends SysYParserBaseVisitor<LLVMValueRef> {
             LLVMValueRef argValue = LLVMGetParam(function, i);
             LLVMBuildStore(builder, argValue, varPointer);
         }
-
+        hasReturn = false;
         visit(ctx.block());
-
+        if (!hasReturn) {
+            LLVMBuildRetVoid(builder);
+        }
         currentScope = currentScope.getEnclosingScope();
         return function;
     }
@@ -95,10 +99,23 @@ public class MyIRVisitor extends SysYParserBaseVisitor<LLVMValueRef> {
 
     @Override
     public LLVMValueRef visitReturnStat(SysYParser.ReturnStatContext ctx) {
+        hasReturn = true;
         if (ctx.exp() != null) {
-            LLVMBuildRet(builder, visit(ctx.exp()));
+            return LLVMBuildRet(builder, visit(ctx.exp()));
+        } else {
+            return LLVMBuildRetVoid(builder);
         }
-        return null;
+    }
+
+    /**
+     * lVal
+     * @param ctx the parse tree
+     * @return LLVMValueRef
+     */
+    @Override
+    public LLVMValueRef visitLVal(SysYParser.LValContext ctx) {
+        // TODO: 数组
+        return currentScope.resolve(ctx.IDENT().getText());
     }
 
     /**
@@ -121,8 +138,8 @@ public class MyIRVisitor extends SysYParserBaseVisitor<LLVMValueRef> {
 
     @Override
     public LLVMValueRef visitLeftValExp(SysYParser.LeftValExpContext ctx) {
-        // TODO
-        return super.visitLeftValExp(ctx);
+        LLVMValueRef lValPointer = this.visitLVal(ctx.lVal());
+        return LLVMBuildLoad(builder, lValPointer, ctx.lVal().getText());
     }
 
     @Override
@@ -157,8 +174,19 @@ public class MyIRVisitor extends SysYParserBaseVisitor<LLVMValueRef> {
 
     @Override
     public LLVMValueRef visitFuncCallExp(SysYParser.FuncCallExpContext ctx) {
-        // TODO
-        return super.visitFuncCallExp(ctx);
+        String funcName = ctx.IDENT().getText();
+        int argsCount = 0;
+        if (ctx.funcRParams() != null) {
+            argsCount = ctx.funcRParams().param().size();
+        }
+
+        LLVMValueRef function = currentScope.resolve(funcName);
+        PointerPointer<Pointer> args = new PointerPointer<>(argsCount);
+        for (int i = 0; i < argsCount; i++) {
+            SysYParser.ParamContext param = ctx.funcRParams().param(i);
+            args.put(i, visit(param.exp()));
+        }
+        return LLVMBuildCall(builder, function, args, argsCount, "");
     }
 
     @Override
@@ -188,6 +216,17 @@ public class MyIRVisitor extends SysYParserBaseVisitor<LLVMValueRef> {
             return voidType;
         } else {
             return i32Type;
+        }
+    }
+
+    private void buildGEP(int elementCount, LLVMValueRef varPointer, LLVMValueRef[] initArray) {
+        LLVMValueRef[] arrayPointer = new LLVMValueRef[2];
+        arrayPointer[0] = zero;
+        for (int i = 0; i < elementCount; i++) {
+            arrayPointer[1] = LLVMConstInt(i32Type, i, 0);
+            PointerPointer<LLVMValueRef> indexPointer = new PointerPointer<>(arrayPointer);
+            LLVMValueRef elementPtr = LLVMBuildGEP(builder, varPointer, indexPointer, 2, "GEP_" + i);
+            LLVMBuildStore(builder, initArray[i], elementPtr);
         }
     }
 }

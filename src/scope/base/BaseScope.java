@@ -1,6 +1,6 @@
 package scope.base;
 
-import symbol.base.Symbol;
+import org.bytedeco.llvm.LLVM.LLVMValueRef;
 
 import java.util.LinkedHashMap;
 import java.util.Map;
@@ -8,7 +8,7 @@ import java.util.Map;
 public class BaseScope implements Scope{
     private final Scope enclosingScope;
     private final String name;
-    private final Map<String, Symbol> symbols = new LinkedHashMap<>();
+    private final Map<String, LLVMValueRef> valueRefMap = new LinkedHashMap<>();
     public BaseScope(Scope enclosingScope, String name) {
         this.enclosingScope = enclosingScope;
         this.name = name;
@@ -24,20 +24,20 @@ public class BaseScope implements Scope{
     }
 
     @Override
-    public Map<String, Symbol> getSymbols() {
-        return this.symbols;
+    public Map<String, LLVMValueRef> getValueRefMap() {
+        return this.valueRefMap;
     }
 
     @Override
-    public void define(Symbol symbol) {
-        symbols.put(symbol.getName(), symbol);
+    public void define(String name, LLVMValueRef valueRef) {
+        valueRefMap.put(name, valueRef);
     }
 
     @Override
-    public Symbol resolve(String name) {
-        Symbol symbol = symbols.get(name);
-        if (symbol != null) {
-            return symbol;
+    public LLVMValueRef resolve(String name) {
+        LLVMValueRef valueRef = valueRefMap.get(name);
+        if (valueRef != null) {
+            return valueRef;
         }
         // 当前作用域没找到
         if (enclosingScope != null) {
@@ -47,10 +47,10 @@ public class BaseScope implements Scope{
     }
 
     @Override
-    public Symbol resolveInCurScope(String name) {
-        Symbol symbol = symbols.get(name);
-        if (symbol != null) {
-            return symbol;
+    public LLVMValueRef resolveInCurScope(String name) {
+        LLVMValueRef valueRef = valueRefMap.get(name);
+        if (valueRef != null) {
+            return valueRef;
         }
         return null;
     }

@@ -53,8 +53,8 @@ funcDef
    ;
 
 funcType
-   : VOID   # Void
-   | INT    # Int
+   : VOID
+   | INT
    ;
 
 funcFParams
@@ -112,9 +112,9 @@ number
    ;
 
 unaryOp
-   : PLUS   # Plus
-   | MINUS  # Minus
-   | NOT    # Not
+   : PLUS
+   | MINUS
+   | NOT
    ;
 
 funcRParams

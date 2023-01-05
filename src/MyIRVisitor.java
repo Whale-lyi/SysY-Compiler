@@ -28,7 +28,6 @@ public class MyIRVisitor extends SysYParserBaseVisitor<LLVMValueRef> {
         if (LLVMPrintModuleToFile(module, destFile, error) != 0) {    // module是你自定义的LLVMModuleRef对象
             LLVMDisposeMessage(error);
         }
-//        LLVMDumpModule(module);
 
         return result;
     }

@@ -1,14 +1,14 @@
 package scope.base;
 
-import symbol.base.Symbol;
+import org.bytedeco.llvm.LLVM.LLVMValueRef;
 
 import java.util.Map;
 
 public interface Scope {
     String getName();
     Scope getEnclosingScope();
-    Map<String, Symbol> getSymbols();
-    void define(Symbol symbol);
-    Symbol resolve(String name);
-    Symbol resolveInCurScope(String name);
+    Map<String, LLVMValueRef> getValueRefMap();
+    void define(String name, LLVMValueRef valueRef);
+    LLVMValueRef resolve(String name);
+    LLVMValueRef resolveInCurScope(String name);
 }

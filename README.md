@@ -1,7 +1,7 @@
 # SysY-Compiler
 NJUSE Compilers lab
 
-lab4及以后的实验为翻译为LLVM中间代码
+lab4-7为LLVM的翻译
 
 ### lab1
 - 词法分析

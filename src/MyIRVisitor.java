@@ -285,11 +285,11 @@ public class MyIRVisitor extends SysYParserBaseVisitor<LLVMValueRef> {
         visit(ctx.tstst);
         LLVMBuildBr(builder, next);
         // false
+        LLVMPositionBuilderAtEnd(builder, ifFalse);
         if (ctx.ELSE() != null) {
-            LLVMPositionBuilderAtEnd(builder, ifFalse);
             visit(ctx.fstat);
-            LLVMBuildBr(builder, next);
         }
+        LLVMBuildBr(builder, next);
         // next
         LLVMPositionBuilderAtEnd(builder, next);
 

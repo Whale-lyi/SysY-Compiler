@@ -277,14 +277,23 @@ public class MyIRVisitor extends SysYParserBaseVisitor<LLVMValueRef> {
 
         LLVMBasicBlockRef ifTrue = LLVMAppendBasicBlock(currentFunc, /*blockName:String*/"if_true");
         LLVMBasicBlockRef ifFalse = LLVMAppendBasicBlock(currentFunc, /*blockName:String*/"if_false");
-
+        LLVMBasicBlockRef next = LLVMAppendBasicBlock(currentFunc, /*blockName:String*/"next");
         // 跳转
         LLVMBuildCondBr(builder, condition, ifTrue, ifFalse);
-
+        // true
         LLVMPositionBuilderAtEnd(builder, ifTrue);
-        visit(ctx);
+        visit(ctx.tstst);
+        LLVMBuildBr(builder, next);
+        // false
+        if (ctx.ELSE() != null) {
+            LLVMPositionBuilderAtEnd(builder, ifFalse);
+            visit(ctx.fstat);
+            LLVMBuildBr(builder, next);
+        }
+        // next
+        LLVMPositionBuilderAtEnd(builder, next);
 
-        return visit(ctx.cond());
+        return null;
     }
 
     @Override

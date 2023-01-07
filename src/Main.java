@@ -10,10 +10,10 @@ public class Main {
         if (args.length != 2) {
             System.err.println("There should be 2 arguments");
         }
-//        String source = args[0];
-//        String destination = args[1];
-        String source = "tests/test1.sysy";
-        String destination = "tests/test2.ll";
+        String source = args[0];
+        String destination = args[1];
+//        String source = "tests/test1.sysy";
+//        String destination = "tests/test2.ll";
         CharStream input = CharStreams.fromFileName(source);
         SysYLexer sysYLexer = new SysYLexer(input);
         CommonTokenStream tokens = new CommonTokenStream(sysYLexer);

@@ -1,19 +1,11 @@
-int a;
-const int b = 10;
-int c[2];
-const int d[2] = {1, 2};
-
-int f(int k) {
-    return k + 1;
-}
+const int a[2] = {1};
 
 int main() {
-    if(b != 10){
-        a = b;
-        c[0] = (a + b) * f(d[0]);
+    int b[2] = {4, 6};
+    if(a[0]){
+        b[0] = a[1];
     } else {
-        c[0] = f(a);
-        return c[0];
+        b[0] = a[0];
     }
-    return c[0];
+    return b[0];
 }

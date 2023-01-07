@@ -275,9 +275,9 @@ public class MyIRVisitor extends SysYParserBaseVisitor<LLVMValueRef> {
     public LLVMValueRef visitIfStat(SysYParser.IfStatContext ctx) {
         LLVMValueRef condition = LLVMBuildICmp(builder, LLVMIntNE, visit(ctx.cond()), zero, "icmp_res"); //i8
 
-        LLVMBasicBlockRef ifTrue = LLVMAppendBasicBlock(currentFunc, /*blockName:String*/"if_true");
-        LLVMBasicBlockRef ifFalse = LLVMAppendBasicBlock(currentFunc, /*blockName:String*/"if_false");
-        LLVMBasicBlockRef next = LLVMAppendBasicBlock(currentFunc, /*blockName:String*/"next");
+        LLVMBasicBlockRef ifTrue = LLVMAppendBasicBlock(currentFunc, "if_true");
+        LLVMBasicBlockRef ifFalse = LLVMAppendBasicBlock(currentFunc, "if_false");
+        LLVMBasicBlockRef next = LLVMAppendBasicBlock(currentFunc, "next");
         // 跳转
         LLVMBuildCondBr(builder, condition, ifTrue, ifFalse);
         // true

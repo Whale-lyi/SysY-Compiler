@@ -14,6 +14,7 @@ public class MyIRVisitor extends SysYParserBaseVisitor<LLVMValueRef> {
     private final LLVMTypeRef voidType = LLVMVoidType();
     private GlobalScope globalScope = null;
     private Scope currentScope = null;
+    private LLVMValueRef currentFunc = null;
     private final LLVMValueRef zero = LLVMConstInt(i32Type, 0, 0);
     public static final BytePointer error = new BytePointer();
     private String destFile;
@@ -64,6 +65,7 @@ public class MyIRVisitor extends SysYParserBaseVisitor<LLVMValueRef> {
         //生成函数，即向之前创建的module中添加函数
         LLVMValueRef function = LLVMAddFunction(module, funcName, funcType);
         currentScope.define(funcName, function);
+        currentFunc = function;
         // 创建基本块
         LLVMBasicBlockRef block = LLVMAppendBasicBlock(function, funcName + "_entry");
         // 在当前基本块插入指令
@@ -271,6 +273,16 @@ public class MyIRVisitor extends SysYParserBaseVisitor<LLVMValueRef> {
 
     @Override
     public LLVMValueRef visitIfStat(SysYParser.IfStatContext ctx) {
+        LLVMValueRef condition = LLVMBuildICmp(builder, LLVMIntNE, visit(ctx.cond()), zero, "icmp_res"); //i8
+
+        LLVMBasicBlockRef ifTrue = LLVMAppendBasicBlock(currentFunc, /*blockName:String*/"if_true");
+        LLVMBasicBlockRef ifFalse = LLVMAppendBasicBlock(currentFunc, /*blockName:String*/"if_false");
+
+        // 跳转
+        LLVMBuildCondBr(builder, condition, ifTrue, ifFalse);
+
+        LLVMPositionBuilderAtEnd(builder, ifTrue);
+        visit(ctx);
 
         return visit(ctx.cond());
     }

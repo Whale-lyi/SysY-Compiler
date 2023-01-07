@@ -77,7 +77,7 @@ stmt
    : lVal ASSIGN exp SEMICOLON                  # AssignStat
    | (exp)? SEMICOLON                           # ExpStat
    | block                                      # BlockStat
-   | IF L_PAREN cond R_PAREN stmt (ELSE stmt)?  # IfStat
+   | IF L_PAREN cond R_PAREN tstst = stmt (ELSE fstat = stmt)?  # IfStat
    | WHILE L_PAREN cond R_PAREN stmt            # WhileStat
    | BREAK SEMICOLON                            # BreakStat
    | CONTINUE SEMICOLON                         # ContinueStat

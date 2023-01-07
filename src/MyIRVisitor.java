@@ -110,30 +110,55 @@ public class MyIRVisitor extends SysYParserBaseVisitor<LLVMValueRef> {
                 varType = LLVMVectorType(i32Type, elementCount);
             }
 
-            LLVMValueRef varPointer = LLVMBuildAlloca(builder, varType, "pointer_" + varName);
-
-            SysYParser.ConstInitValContext initValContext = constDefContext.constInitVal();
-            if (initValContext instanceof SysYParser.ExpConstInitValContext) {
-                // 整型
-                SysYParser.ExpConstInitValContext expInitValContext = (SysYParser.ExpConstInitValContext) initValContext;
-                LLVMValueRef initVal = visit(expInitValContext.constExp().exp());
-                LLVMBuildStore(builder, initVal, varPointer);
-            } else {
-                // 数组
-                SysYParser.ArrayConstInitValContext arrayInitValContext = (SysYParser.ArrayConstInitValContext) initValContext;
-                int initValCount = arrayInitValContext.constInitVal().size();
-                LLVMValueRef[] initArray = new LLVMValueRef[elementCount];
-                for (int i = 0; i < elementCount; i++) {
-                    if (i < initValCount) {
-                        initArray[i] = visit(arrayInitValContext.constInitVal(i));
-                    } else {
-                        initArray[i] = zero;
+            if (currentScope == globalScope) { // 全局变量
+                LLVMValueRef globalVar;
+                if (constDefContext.constExp() != null && constDefContext.constExp().size() > 0) {
+                    // array
+                    LLVMValueRef[] initArray = new LLVMValueRef[elementCount];
+                    SysYParser.ArrayConstInitValContext arrayInitValContext = (SysYParser.ArrayConstInitValContext) constDefContext.constInitVal();
+                    int initValCount = arrayInitValContext.constInitVal().size();
+                    for (int i = 0; i < elementCount; i++) {
+                        if (i < initValCount) {
+                            initArray[i] = visit(arrayInitValContext.constInitVal(i));
+                        } else {
+                            initArray[i] = zero;
+                        }
                     }
+                    globalVar = LLVMAddGlobal(module, varType, varName);
+                    LLVMSetInitializer(globalVar, LLVMConstVector(new PointerPointer(initArray), elementCount));
+                } else {
+                    //创建全局变量
+                    globalVar = LLVMAddGlobal(module, varType, varName);
+                    //为全局变量设置初始化器
+                    LLVMSetInitializer(globalVar, visit(constDefContext.constInitVal()));
                 }
-                buildGEP(elementCount, varPointer, initArray);
-            }
+                currentScope.define(varName, globalVar);
+            } else { // 局部变量
+                LLVMValueRef varPointer = LLVMBuildAlloca(builder, varType, "pointer_" + varName);
 
-            currentScope.define(varName, varPointer);
+                SysYParser.ConstInitValContext initValContext = constDefContext.constInitVal();
+                if (initValContext instanceof SysYParser.ExpConstInitValContext) {
+                    // 整型
+                    SysYParser.ExpConstInitValContext expInitValContext = (SysYParser.ExpConstInitValContext) initValContext;
+                    LLVMValueRef initVal = visit(expInitValContext.constExp().exp());
+                    LLVMBuildStore(builder, initVal, varPointer);
+                } else {
+                    // 数组
+                    SysYParser.ArrayConstInitValContext arrayInitValContext = (SysYParser.ArrayConstInitValContext) initValContext;
+                    int initValCount = arrayInitValContext.constInitVal().size();
+                    LLVMValueRef[] initArray = new LLVMValueRef[elementCount];
+                    for (int i = 0; i < elementCount; i++) {
+                        if (i < initValCount) {
+                            initArray[i] = visit(arrayInitValContext.constInitVal(i));
+                        } else {
+                            initArray[i] = zero;
+                        }
+                    }
+                    buildGEP(elementCount, varPointer, initArray);
+                }
+
+                currentScope.define(varName, varPointer);
+            }
         }
         return null;
     }
@@ -156,32 +181,68 @@ public class MyIRVisitor extends SysYParserBaseVisitor<LLVMValueRef> {
                 varType = LLVMVectorType(i32Type, elementCount);
             }
 
-            LLVMValueRef varPointer = LLVMBuildAlloca(builder, varType, "pointer_" + varName);
-
-            if (varDefContext.ASSIGN() != null) {
-                SysYParser.InitValContext initValContext = varDefContext.initVal();
-                if (initValContext instanceof SysYParser.ExpInitValContext) {
-                    // 整型
-                    SysYParser.ExpInitValContext expInitValContext = (SysYParser.ExpInitValContext) initValContext;
-                    LLVMValueRef initVal = visit(expInitValContext.exp());
-                    LLVMBuildStore(builder, initVal, varPointer);
-                } else {
-                    // 数组
-                    SysYParser.ArrayInitValContext arrayInitValContext = (SysYParser.ArrayInitValContext) initValContext;
-                    int initValCount = arrayInitValContext.initVal().size();
+            if (currentScope == globalScope) { // 全局变量
+                LLVMValueRef globalVar;
+                if (varDefContext.constExp() != null && varDefContext.constExp().size() > 0) {
+                    // array
                     LLVMValueRef[] initArray = new LLVMValueRef[elementCount];
-                    for (int i = 0; i < elementCount; i++) {
-                        if (i < initValCount) {
-                            initArray[i] = visit(arrayInitValContext.initVal(i));
-                        } else {
+                    if (varDefContext.ASSIGN() != null) {
+                        SysYParser.ArrayInitValContext arrayInitValContext = (SysYParser.ArrayInitValContext) varDefContext.initVal();
+                        int initValCount = arrayInitValContext.initVal().size();
+                        for (int i = 0; i < elementCount; i++) {
+                            if (i < initValCount) {
+                                initArray[i] = visit(arrayInitValContext.initVal(i));
+                            } else {
+                                initArray[i] = zero;
+                            }
+                        }
+                    } else {
+                        // 没有初始化, =0
+                        for (int i = 0; i < elementCount; i++) {
                             initArray[i] = zero;
                         }
                     }
-                    buildGEP(elementCount, varPointer, initArray);
+                    globalVar = LLVMAddGlobal(module, varType, varName);
+                    LLVMSetInitializer(globalVar, LLVMConstVector(new PointerPointer(initArray), elementCount));
+                } else {
+                    LLVMValueRef value = zero;
+                    if (varDefContext.ASSIGN() != null) {
+                        value = visit(varDefContext.initVal());
+                    }
+                    //创建全局变量
+                    globalVar = LLVMAddGlobal(module, varType, varName);
+                    //为全局变量设置初始化器
+                    LLVMSetInitializer(globalVar, value);
                 }
-            }
+                currentScope.define(varName, globalVar);
+            } else { // 局部变量
+                LLVMValueRef varPointer = LLVMBuildAlloca(builder, varType, "pointer_" + varName);
 
-            currentScope.define(varName, varPointer);
+                if (varDefContext.ASSIGN() != null) {
+                    SysYParser.InitValContext initValContext = varDefContext.initVal();
+                    if (initValContext instanceof SysYParser.ExpInitValContext) {
+                        // 整型
+                        SysYParser.ExpInitValContext expInitValContext = (SysYParser.ExpInitValContext) initValContext;
+                        LLVMValueRef initVal = visit(expInitValContext.exp());
+                        LLVMBuildStore(builder, initVal, varPointer);
+                    } else {
+                        // 数组
+                        SysYParser.ArrayInitValContext arrayInitValContext = (SysYParser.ArrayInitValContext) initValContext;
+                        int initValCount = arrayInitValContext.initVal().size();
+                        LLVMValueRef[] initArray = new LLVMValueRef[elementCount];
+                        for (int i = 0; i < elementCount; i++) {
+                            if (i < initValCount) {
+                                initArray[i] = visit(arrayInitValContext.initVal(i));
+                            } else {
+                                initArray[i] = zero;
+                            }
+                        }
+                        buildGEP(elementCount, varPointer, initArray);
+                    }
+                }
+
+                currentScope.define(varName, varPointer);
+            }
         }
         return null;
     }
@@ -206,6 +267,63 @@ public class MyIRVisitor extends SysYParserBaseVisitor<LLVMValueRef> {
         LLVMValueRef lValPointer = visitLVal(ctx.lVal());
         LLVMValueRef rVal = visit(ctx.exp());
         return LLVMBuildStore(builder, rVal, lValPointer);
+    }
+
+    @Override
+    public LLVMValueRef visitIfStat(SysYParser.IfStatContext ctx) {
+
+        return visit(ctx.cond());
+    }
+
+    @Override
+    public LLVMValueRef visitOrCond(SysYParser.OrCondContext ctx) {
+        LLVMValueRef lvalue = visit(ctx.lhs);
+        LLVMValueRef rvalue = visit(ctx.rhs);
+        return LLVMBuildOr(builder, lvalue, rvalue, "or_res");
+    }
+
+    @Override
+    public LLVMValueRef visitExpCond(SysYParser.ExpCondContext ctx) {
+        return visit(ctx.exp());
+    }
+
+    @Override
+    public LLVMValueRef visitAndCond(SysYParser.AndCondContext ctx) {
+        LLVMValueRef lvalue = visit(ctx.lhs);
+        LLVMValueRef rvalue = visit(ctx.rhs);
+        return LLVMBuildAnd(builder, lvalue, rvalue, "and_res");
+    }
+
+    @Override
+    public LLVMValueRef visitLTGTLEGECond(SysYParser.LTGTLEGECondContext ctx) {
+        LLVMValueRef lvalue = visit(ctx.lhs);
+        LLVMValueRef rvalue = visit(ctx.rhs);
+        LLVMValueRef result = null; // i8
+        if (ctx.op.getType() == SysYParser.LT) {
+            result = LLVMBuildICmp(builder, LLVMIntSLT, lvalue, rvalue, "icmp_res");
+        } else if (ctx.op.getType() == SysYParser.GT) {
+            result = LLVMBuildICmp(builder, LLVMIntSGT, lvalue, rvalue, "icmp_res");
+        } else if (ctx.op.getType() == SysYParser.LE) {
+            result = LLVMBuildICmp(builder, LLVMIntSLE, lvalue, rvalue, "icmp_res");
+        } else if (ctx.op.getType() == SysYParser.GE) {
+            result = LLVMBuildICmp(builder, LLVMIntSGE, lvalue, rvalue, "icmp_res");
+        }
+        result = LLVMBuildZExt(builder, result, i32Type, "zext_res");
+        return result;
+    }
+
+    @Override
+    public LLVMValueRef visitEQNEQCond(SysYParser.EQNEQCondContext ctx) {
+        LLVMValueRef lvalue = visit(ctx.lhs);
+        LLVMValueRef rvalue = visit(ctx.rhs);
+        LLVMValueRef result = null; // i8
+        if (ctx.op.getType() == SysYParser.EQ) {
+            result = LLVMBuildICmp(builder, LLVMIntEQ, lvalue, rvalue, "icmp_res");
+        } else if (ctx.op.getType() == SysYParser.NEQ) {
+            result = LLVMBuildICmp(builder, LLVMIntNE, lvalue, rvalue, "icmp_res");
+        }
+        result = LLVMBuildZExt(builder, result, i32Type, "zext_res");
+        return result;
     }
 
     /**

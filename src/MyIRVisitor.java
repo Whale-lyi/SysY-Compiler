@@ -357,8 +357,6 @@ public class MyIRVisitor extends SysYParserBaseVisitor<LLVMValueRef> {
         if (ctx.exp() != null && ctx.exp().size() > 0) {
             // 数组
             LLVMValueRef varPointer = currentScope.resolve(ctx.IDENT().getText());
-//            int index = (int) LLVMConstIntGetSExtValue(visit(ctx.exp(0)));
-//            PointerPointer<LLVMValueRef> indexPointer = new PointerPointer<>(zero, LLVMConstInt(i32Type, index, 0));
             PointerPointer<LLVMValueRef> indexPointer = new PointerPointer<>(zero, visit(ctx.exp(0)));
             return LLVMBuildGEP(builder, varPointer, indexPointer, 2, "pointer_array");
         } else {

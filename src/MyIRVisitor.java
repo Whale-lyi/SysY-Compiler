@@ -5,6 +5,8 @@ import org.bytedeco.llvm.LLVM.*;
 import scope.*;
 import scope.base.*;
 
+import java.util.Stack;
+
 import static org.bytedeco.llvm.global.LLVM.*;
 
 public class MyIRVisitor extends SysYParserBaseVisitor<LLVMValueRef> {
@@ -19,6 +21,7 @@ public class MyIRVisitor extends SysYParserBaseVisitor<LLVMValueRef> {
     public static final BytePointer error = new BytePointer();
     private String destFile;
     private boolean hasReturn = false;
+    private Stack<LLVMBasicBlockRef> whileStack = new Stack<>();
     public MyIRVisitor(String destFile) {
         //初始化LLVM
         LLVMInitializeCore(LLVMGetGlobalPassRegistry());
@@ -277,12 +280,14 @@ public class MyIRVisitor extends SysYParserBaseVisitor<LLVMValueRef> {
         LLVMBasicBlockRef whileBody = LLVMAppendBasicBlock(currentFunc, "while_body");
         LLVMBasicBlockRef next = LLVMAppendBasicBlock(currentFunc, "next");
 
-        LLVMBuildBr(builder, whileCondition);
+        whileStack.push(next);
 
+        LLVMBuildBr(builder, whileCondition);
+        // 循环条件
         LLVMPositionBuilderAtEnd(builder, whileCondition);
         LLVMValueRef condition = LLVMBuildICmp(builder, LLVMIntNE, visit(ctx.cond()), zero, "icmp_res"); //i8
         LLVMBuildCondBr(builder, condition, whileBody, next);
-
+        // 循环体
         LLVMPositionBuilderAtEnd(builder, whileBody);
         visit(ctx.stmt());
         LLVMBuildBr(builder, whileCondition);
@@ -290,6 +295,18 @@ public class MyIRVisitor extends SysYParserBaseVisitor<LLVMValueRef> {
         LLVMPositionBuilderAtEnd(builder, next);
 
         return null;
+    }
+
+    @Override
+    public LLVMValueRef visitBreakStat(SysYParser.BreakStatContext ctx) {
+        LLVMBuildBr(builder, whileStack.pop());
+        return null;
+    }
+
+    @Override
+    public LLVMValueRef visitContinueStat(SysYParser.ContinueStatContext ctx) {
+
+        return super.visitContinueStat(ctx);
     }
 
     @Override

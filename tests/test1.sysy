@@ -1,13 +1,9 @@
-const int a[2] = {1};
-
+int a = 10;
 int main() {
-    int b[2] = {4};
-    b[a[0]] = 6;
-    b[1] = 7;
-    if(a[0] > b[1]){
-        b[0] = a[1];
-    } else {
-        b[0] = b[1];
-    }
-    return b[0];
+	int i = 0;
+	while(i < 5) {
+		i = i + 1;
+	}
+	a = i;
+    return a;
 }

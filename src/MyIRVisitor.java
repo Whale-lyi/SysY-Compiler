@@ -272,6 +272,27 @@ public class MyIRVisitor extends SysYParserBaseVisitor<LLVMValueRef> {
     }
 
     @Override
+    public LLVMValueRef visitWhileStat(SysYParser.WhileStatContext ctx) {
+        LLVMBasicBlockRef whileCondition = LLVMAppendBasicBlock(currentFunc, "while_condition");
+        LLVMBasicBlockRef whileBody = LLVMAppendBasicBlock(currentFunc, "while_body");
+        LLVMBasicBlockRef next = LLVMAppendBasicBlock(currentFunc, "next");
+
+        LLVMBuildBr(builder, whileCondition);
+
+        LLVMPositionBuilderAtEnd(builder, whileCondition);
+        LLVMValueRef condition = LLVMBuildICmp(builder, LLVMIntNE, visit(ctx.cond()), zero, "icmp_res"); //i8
+        LLVMBuildCondBr(builder, condition, whileBody, next);
+
+        LLVMPositionBuilderAtEnd(builder, whileBody);
+        visit(ctx.stmt());
+        LLVMBuildBr(builder, whileCondition);
+
+        LLVMPositionBuilderAtEnd(builder, next);
+
+        return null;
+    }
+
+    @Override
     public LLVMValueRef visitIfStat(SysYParser.IfStatContext ctx) {
         LLVMValueRef condition = LLVMBuildICmp(builder, LLVMIntNE, visit(ctx.cond()), zero, "icmp_res"); //i8
 

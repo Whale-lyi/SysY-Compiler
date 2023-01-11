@@ -20,13 +20,9 @@ while_body:                                       ; preds = %while_condition
   %a2 = load i32, i32* %pointer_a, align 4
   %sub_res = sub i32 %a2, 1
   store i32 %sub_res, i32* %pointer_a, align 4
-  ret i32 1
-  %count = load i32, i32* %pointer_count, align 4
-  %add_res = add i32 %count, 1
-  store i32 %add_res, i32* %pointer_count, align 4
+  ret void
   br label %while_condition
 
 next:                                             ; preds = %while_condition
-  %count3 = load i32, i32* %pointer_count, align 4
-  ret i32 %count3
+  ret void
 }

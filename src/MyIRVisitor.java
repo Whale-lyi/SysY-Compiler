@@ -266,7 +266,6 @@ public class MyIRVisitor extends SysYParserBaseVisitor<LLVMValueRef> {
 
     @Override
     public LLVMValueRef visitReturnStat(SysYParser.ReturnStatContext ctx) {
-        if (blockHasReturn) return null;
         hasReturn = true;
         blockHasReturn = true;
         if (ctx.exp() != null) {

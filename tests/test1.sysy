@@ -9,7 +9,7 @@ int main() {
             }
             i = i + 1;
         }
-        if(j == 3) break;
+        if(j == 3) continue;
 	}
 	a = i + j;
     return a;

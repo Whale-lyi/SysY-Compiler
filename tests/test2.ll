@@ -11,7 +11,7 @@ main_entry:
   store i32 0, i32* %pointer_j, align 4
   br label %while_condition
 
-while_condition:                                  ; preds = %next22, %main_entry
+while_condition:                                  ; preds = %next22, %if_true20, %main_entry
   %j = load i32, i32* %pointer_j, align 4
   %icmp_res = icmp slt i32 %j, 5
   %zext_res = zext i1 %icmp_res to i32
@@ -24,7 +24,7 @@ while_body:                                       ; preds = %while_condition
   store i32 %add_res, i32* %pointer_j, align 4
   br label %while_condition3
 
-next:                                             ; preds = %if_true20, %while_condition
+next:                                             ; preds = %while_condition
   %i23 = load i32, i32* %pointer_i, align 4
   %j24 = load i32, i32* %pointer_j, align 4
   %add_res25 = add i32 %i23, %j24
@@ -67,7 +67,7 @@ next13:                                           ; preds = %if_false, %if_true
   br label %while_condition3
 
 if_true20:                                        ; preds = %next5
-  br label %next
+  br label %while_condition
   br label %next22
 
 if_false21:                                       ; preds = %next5

@@ -21,7 +21,8 @@ public class MyIRVisitor extends SysYParserBaseVisitor<LLVMValueRef> {
     public static final BytePointer error = new BytePointer();
     private String destFile;
     private boolean hasReturn = false;
-    private Stack<LLVMBasicBlockRef> whileStack = new Stack<>();
+    private Stack<LLVMBasicBlockRef> whileNextStack = new Stack<>();
+    private Stack<LLVMBasicBlockRef> whileCondStack = new Stack<>();
     public MyIRVisitor(String destFile) {
         //初始化LLVM
         LLVMInitializeCore(LLVMGetGlobalPassRegistry());
@@ -280,7 +281,8 @@ public class MyIRVisitor extends SysYParserBaseVisitor<LLVMValueRef> {
         LLVMBasicBlockRef whileBody = LLVMAppendBasicBlock(currentFunc, "while_body");
         LLVMBasicBlockRef next = LLVMAppendBasicBlock(currentFunc, "next");
 
-        whileStack.push(next);
+        whileNextStack.push(next);
+        whileCondStack.push(whileCondition);
 
         LLVMBuildBr(builder, whileCondition);
         // 循环条件
@@ -294,19 +296,25 @@ public class MyIRVisitor extends SysYParserBaseVisitor<LLVMValueRef> {
 
         LLVMPositionBuilderAtEnd(builder, next);
 
+        whileNextStack.pop();
+        whileCondStack.pop();
         return null;
     }
 
     @Override
     public LLVMValueRef visitBreakStat(SysYParser.BreakStatContext ctx) {
-        LLVMBuildBr(builder, whileStack.pop());
+        LLVMBasicBlockRef pop = whileNextStack.pop();
+        whileNextStack.push(pop);
+        LLVMBuildBr(builder, pop);
         return null;
     }
 
     @Override
     public LLVMValueRef visitContinueStat(SysYParser.ContinueStatContext ctx) {
-
-        return super.visitContinueStat(ctx);
+        LLVMBasicBlockRef pop = whileCondStack.pop();
+        whileCondStack.push(pop);
+        LLVMBuildBr(builder, pop);
+        return null;
     }
 
     @Override

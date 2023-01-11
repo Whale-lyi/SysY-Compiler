@@ -174,7 +174,6 @@ public class MyIRVisitor extends SysYParserBaseVisitor<LLVMValueRef> {
 
     @Override
     public LLVMValueRef visitExpConstInitVal(SysYParser.ExpConstInitValContext ctx) {
-        if (blockHasReturn) return null;
         return visit(ctx.constExp().exp());
     }
 
@@ -260,12 +259,12 @@ public class MyIRVisitor extends SysYParserBaseVisitor<LLVMValueRef> {
 
     @Override
     public LLVMValueRef visitExpInitVal(SysYParser.ExpInitValContext ctx) {
-        if (blockHasReturn) return null;
         return visit(ctx.exp());
     }
 
     @Override
     public LLVMValueRef visitReturnStat(SysYParser.ReturnStatContext ctx) {
+        if (blockHasReturn) return null;
         hasReturn = true;
         blockHasReturn = true;
         if (ctx.exp() != null) {
@@ -423,7 +422,6 @@ public class MyIRVisitor extends SysYParserBaseVisitor<LLVMValueRef> {
      */
     @Override
     public LLVMValueRef visitLVal(SysYParser.LValContext ctx) {
-        if (blockHasReturn) return null;
         if (ctx.exp() != null && ctx.exp().size() > 0) {
             // 数组
             LLVMValueRef varPointer = currentScope.resolve(ctx.IDENT().getText());
@@ -439,7 +437,6 @@ public class MyIRVisitor extends SysYParserBaseVisitor<LLVMValueRef> {
      */
     @Override
     public LLVMValueRef visitMulDivModExp(SysYParser.MulDivModExpContext ctx) {
-        if (blockHasReturn) return null;
         LLVMValueRef lvalue = visit(ctx.lhs);
         LLVMValueRef rvalue = visit(ctx.rhs);
         LLVMValueRef result = null;
@@ -455,27 +452,23 @@ public class MyIRVisitor extends SysYParserBaseVisitor<LLVMValueRef> {
 
     @Override
     public LLVMValueRef visitLeftValExp(SysYParser.LeftValExpContext ctx) {
-        if (blockHasReturn) return null;
         LLVMValueRef lValPointer = this.visitLVal(ctx.lVal());
         return LLVMBuildLoad(builder, lValPointer, ctx.lVal().getText());
     }
 
     @Override
     public LLVMValueRef visitIntegerExp(SysYParser.IntegerExpContext ctx) {
-        if (blockHasReturn) return null;
         int number = parseInt(ctx.number().INTEGR_CONST().getText());
         return LLVMConstInt(i32Type, number, 0);
     }
 
     @Override
     public LLVMValueRef visitParenExp(SysYParser.ParenExpContext ctx) {
-        if (blockHasReturn) return null;
         return visit(ctx.exp());
     }
 
     @Override
     public LLVMValueRef visitUnaryOpExp(SysYParser.UnaryOpExpContext ctx) {
-        if (blockHasReturn) return null;
         LLVMValueRef value = visit(ctx.exp());
         LLVMValueRef result = null;
         if ("+".equals(ctx.unaryOp().getText())) {
@@ -495,7 +488,6 @@ public class MyIRVisitor extends SysYParserBaseVisitor<LLVMValueRef> {
 
     @Override
     public LLVMValueRef visitFuncCallExp(SysYParser.FuncCallExpContext ctx) {
-        if (blockHasReturn) return null;
         String funcName = ctx.IDENT().getText();
         int argsCount = 0;
         if (ctx.funcRParams() != null) {
@@ -513,7 +505,6 @@ public class MyIRVisitor extends SysYParserBaseVisitor<LLVMValueRef> {
 
     @Override
     public LLVMValueRef visitAddSubExp(SysYParser.AddSubExpContext ctx) {
-        if (blockHasReturn) return null;
         LLVMValueRef lvalue = visit(ctx.lhs);
         LLVMValueRef rvalue = visit(ctx.rhs);
         LLVMValueRef result = null;

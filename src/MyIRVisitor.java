@@ -297,7 +297,7 @@ public class MyIRVisitor extends SysYParserBaseVisitor<LLVMValueRef> {
         LLVMPositionBuilderAtEnd(builder, whileBody);
         blockHasReturn = false;
         visit(ctx.stmt());
-        LLVMBuildBr(builder, whileCondition);
+        if (!blockHasReturn) LLVMBuildBr(builder, whileCondition);
 
         LLVMPositionBuilderAtEnd(builder, next);
         blockHasReturn = false;

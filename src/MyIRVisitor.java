@@ -115,7 +115,7 @@ public class MyIRVisitor extends SysYParserBaseVisitor<LLVMValueRef> {
             int elementCount = 0;
             if (constDefContext.constExp() != null && constDefContext.constExp().size() > 0) {
                 elementCount = (int) LLVMConstIntGetSExtValue(visit(constDefContext.constExp(0).exp()));
-                varType = LLVMVectorType(i32Type, elementCount);
+                varType = LLVMArrayType(i32Type, elementCount);
             }
 
             if (currentScope == globalScope) { // 全局变量
@@ -133,7 +133,7 @@ public class MyIRVisitor extends SysYParserBaseVisitor<LLVMValueRef> {
                         }
                     }
                     globalVar = LLVMAddGlobal(module, varType, varName);
-                    LLVMSetInitializer(globalVar, LLVMConstVector(new PointerPointer(initArray), elementCount));
+                    LLVMSetInitializer(globalVar, LLVMConstArray(varType, new PointerPointer(initArray), elementCount));
                 } else {
                     //创建全局变量
                     globalVar = LLVMAddGlobal(module, varType, varName);
@@ -186,7 +186,7 @@ public class MyIRVisitor extends SysYParserBaseVisitor<LLVMValueRef> {
             int elementCount = 0;
             if (varDefContext.constExp() != null && varDefContext.constExp().size() > 0) {
                 elementCount = (int) LLVMConstIntGetSExtValue(visit(varDefContext.constExp(0).exp()));
-                varType = LLVMVectorType(i32Type, elementCount);
+                varType = LLVMArrayType(i32Type, elementCount);
             }
 
             if (currentScope == globalScope) { // 全局变量
@@ -211,7 +211,7 @@ public class MyIRVisitor extends SysYParserBaseVisitor<LLVMValueRef> {
                         }
                     }
                     globalVar = LLVMAddGlobal(module, varType, varName);
-                    LLVMSetInitializer(globalVar, LLVMConstVector(new PointerPointer(initArray), elementCount));
+                    LLVMSetInitializer(globalVar, LLVMConstArray(varType, new PointerPointer(initArray), elementCount));
                 } else {
                     LLVMValueRef value = zero;
                     if (varDefContext.ASSIGN() != null) {

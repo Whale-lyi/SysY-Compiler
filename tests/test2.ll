@@ -9,7 +9,7 @@ main_entry:
   store i32 0, i32* %pointer_count, align 4
   br label %while_condition
 
-while_condition:                                  ; preds = %while_body, %main_entry
+while_condition:                                  ; preds = %main_entry
   %a = load i32, i32* %pointer_a, align 4
   %icmp_res = icmp sle i32 %a, 0
   %zext_res = zext i1 %icmp_res to i32
@@ -20,9 +20,9 @@ while_body:                                       ; preds = %while_condition
   %a2 = load i32, i32* %pointer_a, align 4
   %sub_res = sub i32 %a2, 1
   store i32 %sub_res, i32* %pointer_a, align 4
-  ret void
-  br label %while_condition
+  ret i32 1
 
 next:                                             ; preds = %while_condition
-  ret void
+  %count = load i32, i32* %pointer_count, align 4
+  ret i32 %count
 }

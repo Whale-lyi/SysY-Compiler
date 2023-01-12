@@ -107,7 +107,6 @@ public class MyIRVisitor extends SysYParserBaseVisitor<LLVMValueRef> {
 
     @Override
     public LLVMValueRef visitConstDecl(SysYParser.ConstDeclContext ctx) {
-        if (blockHasReturn) return null;
         for (SysYParser.ConstDefContext constDefContext : ctx.constDef()) {
             String varName = constDefContext.IDENT().getText();
             // int 类型
@@ -179,7 +178,6 @@ public class MyIRVisitor extends SysYParserBaseVisitor<LLVMValueRef> {
 
     @Override
     public LLVMValueRef visitVarDecl(SysYParser.VarDeclContext ctx) {
-        if (blockHasReturn) return null;
         for (SysYParser.VarDefContext varDefContext : ctx.varDef()) {
             String varName = varDefContext.IDENT().getText();
             // int 类型
@@ -264,7 +262,6 @@ public class MyIRVisitor extends SysYParserBaseVisitor<LLVMValueRef> {
 
     @Override
     public LLVMValueRef visitReturnStat(SysYParser.ReturnStatContext ctx) {
-        if (blockHasReturn) return null;
         hasReturn = true;
         blockHasReturn = true;
         if (ctx.exp() != null) {
@@ -276,7 +273,6 @@ public class MyIRVisitor extends SysYParserBaseVisitor<LLVMValueRef> {
 
     @Override
     public LLVMValueRef visitAssignStat(SysYParser.AssignStatContext ctx) {
-        if (blockHasReturn) return null;
         LLVMValueRef lValPointer = visitLVal(ctx.lVal());
         LLVMValueRef rVal = visit(ctx.exp());
         return LLVMBuildStore(builder, rVal, lValPointer);
@@ -284,7 +280,6 @@ public class MyIRVisitor extends SysYParserBaseVisitor<LLVMValueRef> {
 
     @Override
     public LLVMValueRef visitWhileStat(SysYParser.WhileStatContext ctx) {
-        if (blockHasReturn) return null;
         LLVMBasicBlockRef whileCondition = LLVMAppendBasicBlock(currentFunc, "while_condition");
         LLVMBasicBlockRef whileBody = LLVMAppendBasicBlock(currentFunc, "while_body");
         LLVMBasicBlockRef next = LLVMAppendBasicBlock(currentFunc, "next");
@@ -314,7 +309,6 @@ public class MyIRVisitor extends SysYParserBaseVisitor<LLVMValueRef> {
 
     @Override
     public LLVMValueRef visitBreakStat(SysYParser.BreakStatContext ctx) {
-        if (blockHasReturn) return null;
         LLVMBasicBlockRef pop = whileNextStack.pop();
         whileNextStack.push(pop);
         LLVMBuildBr(builder, pop);
@@ -323,7 +317,6 @@ public class MyIRVisitor extends SysYParserBaseVisitor<LLVMValueRef> {
 
     @Override
     public LLVMValueRef visitContinueStat(SysYParser.ContinueStatContext ctx) {
-        if (blockHasReturn) return null;
         LLVMBasicBlockRef pop = whileCondStack.pop();
         whileCondStack.push(pop);
         LLVMBuildBr(builder, pop);
@@ -332,7 +325,6 @@ public class MyIRVisitor extends SysYParserBaseVisitor<LLVMValueRef> {
 
     @Override
     public LLVMValueRef visitIfStat(SysYParser.IfStatContext ctx) {
-        if (blockHasReturn) return null;
         LLVMValueRef condition = LLVMBuildICmp(builder, LLVMIntNE, visit(ctx.cond()), zero, "icmp_res"); //i8
 
         LLVMBasicBlockRef ifTrue = LLVMAppendBasicBlock(currentFunc, "if_true");
@@ -344,14 +336,14 @@ public class MyIRVisitor extends SysYParserBaseVisitor<LLVMValueRef> {
         LLVMPositionBuilderAtEnd(builder, ifTrue);
         blockHasReturn = false;
         visit(ctx.tstst);
-        LLVMBuildBr(builder, next);
+        if (!blockHasReturn) LLVMBuildBr(builder, next);
         // false
         LLVMPositionBuilderAtEnd(builder, ifFalse);
         blockHasReturn = false;
         if (ctx.ELSE() != null) {
             visit(ctx.fstat);
         }
-        LLVMBuildBr(builder, next);
+        if (!blockHasReturn) LLVMBuildBr(builder, next);
         // next
         LLVMPositionBuilderAtEnd(builder, next);
         blockHasReturn = false;
@@ -361,7 +353,6 @@ public class MyIRVisitor extends SysYParserBaseVisitor<LLVMValueRef> {
 
     @Override
     public LLVMValueRef visitOrCond(SysYParser.OrCondContext ctx) {
-        if (blockHasReturn) return null;
         LLVMValueRef lvalue = visit(ctx.lhs);
         LLVMValueRef rvalue = visit(ctx.rhs);
         return LLVMBuildOr(builder, lvalue, rvalue, "or_res");
@@ -369,13 +360,11 @@ public class MyIRVisitor extends SysYParserBaseVisitor<LLVMValueRef> {
 
     @Override
     public LLVMValueRef visitExpCond(SysYParser.ExpCondContext ctx) {
-        if (blockHasReturn) return null;
         return visit(ctx.exp());
     }
 
     @Override
     public LLVMValueRef visitAndCond(SysYParser.AndCondContext ctx) {
-        if (blockHasReturn) return null;
         LLVMValueRef lvalue = visit(ctx.lhs);
         LLVMValueRef rvalue = visit(ctx.rhs);
         return LLVMBuildAnd(builder, lvalue, rvalue, "and_res");
@@ -383,7 +372,6 @@ public class MyIRVisitor extends SysYParserBaseVisitor<LLVMValueRef> {
 
     @Override
     public LLVMValueRef visitLTGTLEGECond(SysYParser.LTGTLEGECondContext ctx) {
-        if (blockHasReturn) return null;
         LLVMValueRef lvalue = visit(ctx.lhs);
         LLVMValueRef rvalue = visit(ctx.rhs);
         LLVMValueRef result = null; // i8
@@ -402,7 +390,6 @@ public class MyIRVisitor extends SysYParserBaseVisitor<LLVMValueRef> {
 
     @Override
     public LLVMValueRef visitEQNEQCond(SysYParser.EQNEQCondContext ctx) {
-        if (blockHasReturn) return null;
         LLVMValueRef lvalue = visit(ctx.lhs);
         LLVMValueRef rvalue = visit(ctx.rhs);
         LLVMValueRef result = null; // i8
